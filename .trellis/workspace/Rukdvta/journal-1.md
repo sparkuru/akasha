@@ -205,3 +205,36 @@ Stood up the Akasha HTTP API on Elysia 1.4 as an adapter over an extended servic
 ### Next Steps
 
 - None - task complete
+
+
+## Session 7: M5: Web UI over Elysia typed client
+
+**Date**: 2026-06-11
+**Task**: M5: Web UI over Elysia typed client
+**Branch**: `the-year-of-the-dove`
+
+### Summary
+
+Shipped src/frontend/ — a Bun + vanilla-TS SPA driving browse/preview/download/delete/upload/index entirely through the Eden typed client (treaty<App>), capability-gated from clearance(), errors surfaced from AkashaError. Added server/static.ts (same-origin SPA serving, /api wins) and server/fake-darshan.ts (shared zero-network test rig). Three-tier tests (Tier A logic via treaty(appWith(fake)), Tier B @happy-dom DOM, Tier C static smoke) — 99 pass, zero-network. New spec/frontend/ layer. Gate green: tsc, bun test, biome.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `4b8d1f4` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete

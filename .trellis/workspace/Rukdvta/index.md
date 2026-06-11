@@ -8,7 +8,7 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 6
+- **Total Sessions**: 7
 - **Last Active**: 2026-06-11
 <!-- @@@/auto:current-status -->
 
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~207 | Active |
+| `journal-1.md` | ~240 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 7 | 2026-06-11 | M5: Web UI over Elysia typed client | `4b8d1f4` | `the-year-of-the-dove` |
 | 6 | 2026-06-11 | M4: Elysia API + service layer (routes, schema, OpenAPI) | `b0fe98e` | `the-year-of-the-dove` |
 | 5 | 2026-06-11 | M3: S3Darshan engine over AWS SDK v3 | `36bb33f`, `c1a5aa3` | `the-year-of-the-dove` |
 | 4 | 2026-06-11 | M2: LocalDarshan, rclone.conf parser, CLI | `183e2b6` | `the-year-of-the-dove` |
