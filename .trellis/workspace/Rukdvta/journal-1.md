@@ -172,3 +172,36 @@ Shipped S3Darshan (src/engines/s3.ts) covering S3/TOS/OSS/COS/MinIO/R2 via AWS S
 ### Next Steps
 
 - None - task complete
+
+
+## Session 6: M4: Elysia API + service layer (routes, schema, OpenAPI)
+
+**Date**: 2026-06-11
+**Task**: M4: Elysia API + service layer (routes, schema, OpenAPI)
+**Branch**: `the-year-of-the-dove`
+
+### Summary
+
+Stood up the Akasha HTTP API on Elysia 1.4 as an adapter over an extended service layer. Extended Browser with the full shared use-case surface (stat/upload/delete/url/listBuckets/listRemotes/readIndex/recall), all path-guarded + capability-gated. Built server/{surasthana,schemas,routes,app}.ts: Surasthana injected via .decorate at boot (AKASHA_CONFIG env), t schemas incl. t.File upload + AkashaError wire shape, 10 thin delegating routes, .error/.onError domain->HTTP mapping (404/403/400/500/422). url() returns presigned URL or proxy fallback {url,kind,expiresIn?}. Added @elysiajs/openapi (not swagger) + @elysiajs/eden; OpenAPI doc served, treaty(app) typed-client test. Zero-network tests via app.handle + fake Surasthana. Bumped elysia ^1.4. Synced 3 specs (error-handling AkashaError+validation/422, service Browser surface, elysia M4 wiring). Gate green: tsc 0, bun test 78 pass, biome clean. CLI parity + streaming/Range proxy deferred.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `b0fe98e` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
