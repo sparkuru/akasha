@@ -72,3 +72,36 @@ Replaced the generic backend/React-frontend spec scaffold with Akasha layers (co
 ### Next Steps
 
 - None - task complete
+
+
+## Session 3: M1: Bun/Elysia skeleton, core abstractions, Docker env
+
+**Date**: 2026-06-11
+**Task**: M1: Bun/Elysia skeleton, core abstractions, Docker env
+**Branch**: `the-year-of-the-dove`
+
+### Summary
+
+Implemented milestone M1: scaffolded the from-scratch Bun + ElysiaJS + TypeScript project (package.json, strict tsconfig, Biome scoped to src, bun.lock, minimal bootable Elysia /health app) and the framework-independent core/ layer (Capsule, Darshan/DarshanCapability/PresignOptions/ForbiddenKnowledge, Gnosis/validateRequiredGnosis/InvalidGnosis, Akademiya enroll/summon) with bun:test coverage via an in-test StubDarshan. Added a Docker dev environment (Dockerfile + compose app/verify services, retry-resilient install) since the host has no Bun; verified green in-container (tsc --noEmit, 5 tests pass, biome clean). trellis-check passed all spec dimensions. Pinned Biome/Docker tooling and InvalidGnosis into specs.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `07bc402` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
