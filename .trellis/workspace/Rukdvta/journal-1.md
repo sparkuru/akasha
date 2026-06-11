@@ -238,3 +238,36 @@ Shipped src/frontend/ — a Bun + vanilla-TS SPA driving browse/preview/download
 ### Next Steps
 
 - None - task complete
+
+
+## Session 8: M6 WebdavDarshan engine
+
+**Date**: 2026-06-11
+**Task**: M6 WebdavDarshan engine
+**Branch**: `the-year-of-the-dove`
+
+### Summary
+
+Implemented WebdavDarshan with native fetch, zero-network tests, registration, config compatibility coverage, and engine authoring spec updates.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `0ed3a2a` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
