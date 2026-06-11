@@ -21,7 +21,13 @@ export {
 export { Akademiya, type DarshanCtor } from "./core/akademiya.ts"
 export { loadRcloneConf, MalformedGnosis, parseRcloneConf } from "./config/rclone.ts"
 export { createAkademiya, LocalDarshan, S3Darshan } from "./engines/index.ts"
-export { type Address, Browser, parseAddress } from "./service/browser.ts"
+export {
+  type Address,
+  Browser,
+  parseAddress,
+  type RemoteSummary,
+  type UrlResult,
+} from "./service/browser.ts"
 export { purify, seal } from "./service/path.ts"
 export {
   DEFAULT_IRMINSUL,

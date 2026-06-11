@@ -1,7 +1,9 @@
 # Service Guidelines
 
 > Conventions derived from the agreed `session.md` design (§5, §10, reference §E).
-> Revisit against real code when M1/M2 land.
+> `Browser` + `path.ts` + `house-of-wisdom.ts` landed M1/M2; the full use-case
+> surface (`stat`/`upload`/`delete`/`url`/`listBuckets`/`listRemotes`/`readIndex`/
+> `recall`) landed M4 as the shared source of truth for CLI + `server/`.
 
 ## Responsibilities
 
@@ -29,6 +31,54 @@ ElysiaJS or a vendor SDK.
    surface a "not supported" error to the user for this (`session.md` §10).
 5. **Engines are obtained via `Akademiya.summon(gnosis)`** — the service never
    `new`s an engine class directly.
+
+## `Browser` use-case surface (landed M4)
+
+`Browser(remotes, akademiya)` is the one object both `cli/` and `server/` drive.
+Every method parses via `parseAddress` (→ `purify`, traversal-guarded) and gates
+on `engine.clearance()` before touching an engine. Signatures (source of truth —
+`src/service/browser.ts`):
+
+```ts
+list(ref): Promise<Capsule[]>                          // gate: read
+read(ref, maxBytes?): Promise<Uint8Array>              // gate: read
+stat(ref): Promise<Record<string, unknown>>            // gate: read
+listRemotes(): RemoteSummary[]                         // {name,type,clearance[]}
+listBuckets(remote): Promise<string[]>                 // gate: list_buckets
+upload(ref, source: Uint8Array | ReadableStream): Promise<string>  // gate: upload
+delete(ref): Promise<void>                             // gate: delete
+url(ref, expiresIn?): Promise<UrlResult>               // presign or proxy fallback
+readIndex(indexPath?): Promise<Irminsul>
+recall(ref, indexPath?): Promise<IrminsulDirectory>    // list + persist snapshot
+```
+
+### Rule: `upload` takes bytes/stream, never a Web `File`
+
+**Why**: a Web `File` is an HTTP/transport type. Spec rule 5 (server) forbids
+HTTP types leaking below the boundary. `server/routes.ts` converts the uploaded
+`t.File()` to a `Uint8Array` *before* calling `Browser.upload`.
+
+### Rule: `url()` is the presign-fallback contract (§4 made concrete)
+
+```ts
+export interface UrlResult {
+  url: string
+  kind: "presigned" | "proxy"
+  expiresIn?: number
+}
+```
+
+- `presign` clearance present → real vendor-signed URL, `kind:"presigned"`
+  (carries `expiresIn` when one was requested).
+- absent → relative URL back to our own read route
+  (`/api/object/read?ref=…`), `kind:"proxy"`. Never throw "not supported".
+
+### Rule: `recall` is the only index-write use case
+
+Both interfaces call `Browser.recall` (list → `recordDirectory` → `saveIrminsul`)
+rather than re-sequencing list+persist themselves. (The legacy CLI `recall`
+command still composes the lower-level `house-of-wisdom` helpers directly; new
+callers use `Browser.recall`.)
 
 ## Index file format (`irminsul.json`, decided — reference §E)
 

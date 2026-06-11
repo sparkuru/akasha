@@ -1,7 +1,8 @@
 # Elysia Guidelines
 
-> Conventions derived from the agreed `session.md` design (§1, §6). Revisit
-> against real `server/` code when M4 lands.
+> Conventions derived from the agreed `session.md` design (§1, §6). The server
+> landed M4; the "Landed M4" section below records the concrete wiring against
+> real `server/` code.
 
 ## Server is an adapter only
 
@@ -53,4 +54,49 @@ path, or index logic — all of that lives in the service layer.
 The Bun CLI (`cli/terminal.ts`, `cli/commands.ts`) drives the same service with
 commands `remotes/buckets/ls/cat/get/put/rm/url/browse`. Each command maps to the
 same service call as its sibling route — never fork browsing behavior between the
-two interfaces.
+two interfaces. (M4 shipped `remotes/ls/cat/recall`; the rest are a follow-up
+task — the Web routes already cover the full surface via `Browser`.)
+
+## Landed M4 — concrete wiring
+
+### Dependencies (decided)
+
+`elysia@^1.4` (1.1 was the original pin; 1.4 is what installs). OpenAPI via
+**`@elysiajs/openapi`** — NOT the legacy `@elysiajs/swagger` — served at
+`/openapi` (UI) + `/openapi/json` (raw). Typed client via **`@elysiajs/eden`**
+`treaty`. Route `t` schemas auto-populate the OpenAPI doc; defining
+`server/schemas.ts` IS the documentation step.
+
+### Context injection — `.decorate()` once at boot
+
+```ts
+// server/surasthana.ts
+buildSurasthana(remotes, schools, indexPath?): Surasthana  // Akademiya.enroll(...) + new Browser
+// server/app.ts
+buildApp(surasthana) = new Elysia().use(openapi(...)).decorate("surasthana", surasthana)…
+export type App = typeof app
+bootApp()  // reads AKASHA_CONFIG (default "rclone.conf"), parses remotes, builds Surasthana
+```
+
+Use `.decorate()` (immutable boot singleton), never `.derive()` (per-request) or
+`.state()` (mutable). One `rclone.conf` per process; reload = restart
+(`AKASHA_CONFIG` env). Every handler destructures `{ surasthana }` — no globals.
+
+### `/api/object/url` response contract
+
+```ts
+{ url: string, kind: "presigned" | "proxy", expiresIn?: number }
+```
+
+Presigned for engines with `presign` clearance; otherwise a relative proxy URL
+to `/api/object/read` (see [service-guidelines](../service/service-guidelines.md)
+`url()`). Upload route takes `t.File()` and converts to `Uint8Array` before the
+service call — HTTP `File` never reaches the service.
+
+### Zero-network route tests (required)
+
+Test via `app.handle(new Request("http://localhost/api/..."))` with a fake
+`Surasthana` backed by an in-memory engine (reuse the `StubDarshan`/`FakeDarshan`
+pattern) — no port bind, no S3. Cover: representative read/write/error paths,
+both `kind:"presigned"` and `kind:"proxy"`, the `AkashaError` body + status, the
+served OpenAPI doc, and at least one `treaty(app)` Eden call exercising `App`.

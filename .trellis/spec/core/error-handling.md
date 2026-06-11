@@ -1,7 +1,8 @@
 # Error Handling
 
-> Conventions derived from the agreed `session.md` design. Revisit against real
-> code when M1 lands.
+> Conventions derived from the agreed `session.md` design. Domain errors landed
+> M1–M3 in `core`/`engines`; the `AkashaError` boundary + `.onError` mapping
+> landed M4 in `server/app.ts` (see [server/elysia-guidelines](../server/elysia-guidelines.md)).
 
 ## Error model
 
@@ -41,25 +42,39 @@ The interface layer (`server/`) is the only place that converts (1) into (2).
 
 ## `AkashaError` (boundary shape, decided)
 
+The interface is defined at the boundary in `server/schemas.ts` (not `core`) —
+it is the wire/transport shape and must not leak HTTP concerns downward. Added
+M4: a `"validation"` code for Elysia's built-in `t`-schema `VALIDATION` failure
+(transport-layer, no domain error behind it).
+
 ```ts
+// server/schemas.ts
 export interface AkashaError {
-  code: "forbidden_knowledge" | "invalid_gnosis" | "not_found" | "backend_error"
+  code:
+    | "forbidden_knowledge"
+    | "invalid_gnosis"
+    | "not_found"
+    | "backend_error"
+    | "validation"
   message: string
   detail?: unknown
 }
 ```
 
-Mapping rules (applied in `server/`):
+Mapping rules + HTTP status (applied in `server/app.ts` `.error()` + `.onError()`):
 
-| Source | `code` |
-|---|---|
-| `ForbiddenKnowledge` | `forbidden_knowledge` |
-| `InvalidGnosis` (`requiredGnosis()` / `Gnosis` validation failure) | `invalid_gnosis` |
-| `CapsuleNotFound` (object/bucket/remote not found) | `not_found` |
-| `BackendFault` (vendor SDK / network / engine failure) | `backend_error` |
+| Source | `code` | HTTP |
+|---|---|---|
+| `CapsuleNotFound` (object/bucket/remote not found) | `not_found` | 404 |
+| `ForbiddenKnowledge` (refused / unsupported op) | `forbidden_knowledge` | 403 |
+| `InvalidGnosis` (`requiredGnosis()` / `Gnosis` validation failure) | `invalid_gnosis` | 400 |
+| `BackendFault` (vendor SDK / network / engine failure) | `backend_error` | 500 |
+| Elysia built-in `VALIDATION` (transport `t`-schema) | `validation` | 422 |
+| any other / unknown `code` | `backend_error` | 500 |
 
 `detail` may carry the original error for logs; never put secrets
-(keys, tokens) in `message` or `detail`.
+(keys, tokens) in `message` or `detail`. `InvalidGnosis` surfaces only the
+missing field *names* in `detail`, never values.
 
 ## Engine error policy
 
