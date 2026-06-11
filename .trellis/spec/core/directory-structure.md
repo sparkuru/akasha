@@ -24,14 +24,21 @@ src/
     house-of-wisdom.ts      # directory snapshot persistence (irminsul.json)
     path.ts                 # seal/purify path normalization + traversal guard
   server/
-    app.ts                  # Elysia app creation
+    app.ts                  # Elysia app creation (mounts routes + static web)
     routes.ts               # HTTP routes
     schemas.ts              # Elysia/t schema
     surasthana.ts           # web service context
+    static.ts               # web plugin: serves the SPA shell + /assets/* bundle
+    fake-darshan.ts         # shared zero-network test rig (server + frontend tests)
   cli/
     terminal.ts             # Bun CLI entry
     commands.ts             # remotes/buckets/ls/cat/get/put/rm/url/browse
-  frontend/                 # optional Web UI
+  frontend/                 # Web UI (Bun + vanilla TS, Eden typed client)
+    client.ts               # treaty<App>(location.origin)
+    logic.ts                # DOM-free: gating, error mapping, client calls (Tier A)
+    view.ts                 # DOM construction, capability-gated controls (Tier B)
+    main.ts                 # browser-only controller (nav state + error banner)
+    index.html              # SPA shell (links /assets/main.js)
   index.ts                  # library exports
 ```
 

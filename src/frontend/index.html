@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Akasha</title>
+    <style>
+      :root { color-scheme: light dark; font-family: system-ui, sans-serif; }
+      body { margin: 0; }
+      #app { display: grid; grid-template-columns: 16rem 1fr; grid-template-rows: auto 1fr; min-height: 100vh; }
+      #banner { grid-column: 1 / -1; }
+      #sidebar { border-right: 1px solid #8884; padding: 1rem; }
+      #main { padding: 1rem; overflow: auto; }
+      h2 { font-size: 1rem; margin: 0 0 0.5rem; }
+      ul { list-style: none; margin: 0; padding: 0; }
+      li { margin: 0.125rem 0; }
+      button { font: inherit; cursor: pointer; }
+      button[disabled] { cursor: not-allowed; opacity: 0.4; }
+      .toast.error { background: #c0392b; color: #fff; padding: 0.5rem 1rem; }
+      table.objects { width: 100%; border-collapse: collapse; }
+      table.objects td { padding: 0.25rem 0.5rem; border-bottom: 1px solid #8882; }
+      .cell-size { text-align: right; color: #888; }
+      .actions { text-align: right; white-space: nowrap; }
+      .name.dir { font-weight: 600; }
+      .toolbar { margin-bottom: 0.75rem; display: flex; gap: 0.75rem; align-items: center; }
+      pre { white-space: pre-wrap; word-break: break-all; }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/assets/main.js"></script>
+  </body>
+</html>

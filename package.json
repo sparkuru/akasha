@@ -10,6 +10,8 @@
   "scripts": {
     "akasha": "bun run src/cli/terminal.ts",
     "dev": "bun run src/server/app.ts",
+    "build:web": "bun build ./src/frontend/main.ts --outdir src/frontend/dist --minify --target browser",
+    "dev:web": "bun build ./src/frontend/main.ts --outdir src/frontend/dist --watch --target browser",
     "test": "bun test",
     "typecheck": "tsc --noEmit",
     "lint": "biome check src",
@@ -25,6 +27,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.0",
+    "@happy-dom/global-registrator": "^20.10.2",
     "@types/bun": "latest",
     "typescript": "^5.6.0"
   }

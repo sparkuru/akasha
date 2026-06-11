@@ -6,6 +6,7 @@ import { InvalidGnosis } from "../core/gnosis.ts"
 import { LocalDarshan, S3Darshan } from "../engines/index.ts"
 import { routes } from "./routes.ts"
 import type { AkashaError } from "./schemas.ts"
+import { web } from "./static.ts"
 import { type Surasthana, buildSurasthana } from "./surasthana.ts"
 
 /**
@@ -69,6 +70,8 @@ export function buildApp(surasthana: Surasthana) {
         }
       })
       .use(routes)
+      // The SPA shell + assets at `/` and `/assets/*` (registered last so /api wins).
+      .use(web)
   )
 }
 

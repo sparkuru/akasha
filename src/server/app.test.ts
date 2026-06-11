@@ -1,86 +1,11 @@
 import { describe, expect, it } from "bun:test"
 import { treaty } from "@elysiajs/eden"
 import { Akademiya } from "../core/akademiya.ts"
-import type { Capsule } from "../core/capsule.ts"
-import {
-  CapsuleNotFound,
-  type Darshan,
-  type DarshanCapability,
-  type PresignOptions,
-} from "../core/darshan.ts"
 import type { Gnosis } from "../core/gnosis.ts"
 import { Browser } from "../service/browser.ts"
 import { buildApp } from "./app.ts"
+import { FakeDarshan, appWith, readOnly, s3like } from "./fake-darshan.ts"
 import type { Surasthana } from "./surasthana.ts"
-
-/**
- * In-memory engine — zero network. `caps` selects the clearance set so one class
- * stands in for a full S3-style backend and a read-only one. A `missing` key
- * triggers a `CapsuleNotFound` so the 404 mapping can be exercised.
- */
-class FakeDarshan implements Darshan {
-  static readonly typeName = "fake"
-  readonly typeName = FakeDarshan.typeName
-  private readonly caps: Set<DarshanCapability>
-
-  static requiredGnosis(): Set<string> {
-    return new Set()
-  }
-
-  constructor(gnosis: Gnosis) {
-    const caps = (gnosis.raw.caps ?? "").split(",").filter((s) => s !== "")
-    this.caps = new Set(caps as DarshanCapability[])
-  }
-
-  listObjects(_bucket: string, prefix = ""): Promise<Capsule[]> {
-    if (prefix.startsWith("missing")) {
-      throw new CapsuleNotFound("fake list: not found")
-    }
-    return Promise.resolve([{ key: "a.txt", name: "a.txt", isDir: false, size: 3 }])
-  }
-  stat(_bucket: string, key: string): Promise<Record<string, unknown>> {
-    return Promise.resolve({ key, isDir: false, size: 42 })
-  }
-  readBytes(_bucket: string, _key: string): Promise<Uint8Array> {
-    return Promise.resolve(new Uint8Array([104, 105]))
-  }
-  download(_bucket: string, _key: string, dest: string): Promise<string> {
-    return Promise.resolve(dest)
-  }
-  uploadFile(
-    _bucket: string,
-    source: Blob | Uint8Array | ReadableStream,
-    key: string,
-  ): Promise<string> {
-    void source
-    return Promise.resolve(key)
-  }
-  delete(_bucket: string, _key: string): Promise<void> {
-    return Promise.resolve()
-  }
-  listBuckets(): Promise<string[]> {
-    return Promise.resolve(["one", "two"])
-  }
-  presign(bucket: string, key: string, options?: PresignOptions): Promise<string> {
-    return Promise.resolve(`https://signed.invalid/${bucket}/${key}?e=${options?.expiresIn ?? 0}`)
-  }
-
-  clearance(): Set<DarshanCapability> {
-    return this.caps
-  }
-}
-
-const FULL = "list_buckets,read,download,upload,delete,presign"
-const READ_ONLY = "read"
-
-function appWith(...remotes: Gnosis[]): ReturnType<typeof buildApp> {
-  const browser = new Browser(remotes, new Akademiya().enroll(FakeDarshan))
-  const surasthana: Surasthana = { browser }
-  return buildApp(surasthana)
-}
-
-const s3like: Gnosis = { name: "s3r", type: "fake", raw: { caps: FULL } }
-const readOnly: Gnosis = { name: "ro", type: "fake", raw: { caps: READ_ONLY } }
 
 describe("GET /api/remotes", () => {
   it("lists remotes with their clearance set", async () => {
