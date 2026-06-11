@@ -1,4 +1,4 @@
-import { Akademiya, type DarshanCtor } from "../core/akademiya.ts"
+import type { Akademiya } from "../core/akademiya.ts"
 import type { Gnosis } from "../core/gnosis.ts"
 import { Browser } from "../service/browser.ts"
 
@@ -26,10 +26,9 @@ export interface Surasthana {
  */
 export function buildSurasthana(
   remotes: readonly Gnosis[],
-  schools: DarshanCtor[],
+  akademiya: Akademiya,
   indexPath?: string,
 ): Surasthana {
-  const akademiya = new Akademiya().enroll(...schools)
   const browser = new Browser(remotes, akademiya)
   const surasthana: Surasthana = { browser }
   if (indexPath !== undefined) {

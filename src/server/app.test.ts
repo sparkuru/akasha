@@ -1,9 +1,12 @@
 import { describe, expect, it } from "bun:test"
+import { mkdtemp, rm, writeFile } from "node:fs/promises"
+import { tmpdir } from "node:os"
+import { join } from "node:path"
 import { treaty } from "@elysiajs/eden"
 import { Akademiya } from "../core/akademiya.ts"
 import type { Gnosis } from "../core/gnosis.ts"
 import { Browser } from "../service/browser.ts"
-import { buildApp } from "./app.ts"
+import { bootApp, buildApp } from "./app.ts"
 import { FakeDarshan, appWith, readOnly, s3like } from "./fake-darshan.ts"
 import type { Surasthana } from "./surasthana.ts"
 
@@ -21,6 +24,53 @@ describe("GET /api/remotes", () => {
       },
       { name: "ro", type: "fake", clearance: ["read"] },
     ])
+  })
+})
+
+describe("bootApp", () => {
+  it("uses the built-in engine registry, including WebDAV", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "akasha-boot-"))
+    const config = join(dir, "rclone.conf")
+    const previousConfig = process.env.AKASHA_CONFIG
+    const previousIndex = process.env.AKASHA_INDEX
+    try {
+      await writeFile(
+        config,
+        [
+          "[dav]",
+          "type = webdav",
+          "url = https://dav.example.com/dav/",
+          "",
+          "[local]",
+          "type = local",
+          `root = ${dir}`,
+          "",
+        ].join("\n"),
+      )
+      process.env.AKASHA_CONFIG = config
+      process.env.AKASHA_INDEX = join(dir, "irminsul.json")
+
+      const app = await bootApp()
+      const res = await app.handle(new Request("http://localhost/api/remotes"))
+
+      expect(res.status).toBe(200)
+      expect(await res.json()).toEqual([
+        { name: "dav", type: "webdav", clearance: ["read", "download", "upload", "delete"] },
+        { name: "local", type: "local", clearance: ["read", "download", "upload", "delete"] },
+      ])
+    } finally {
+      if (previousConfig === undefined) {
+        process.env.AKASHA_CONFIG = undefined
+      } else {
+        process.env.AKASHA_CONFIG = previousConfig
+      }
+      if (previousIndex === undefined) {
+        process.env.AKASHA_INDEX = undefined
+      } else {
+        process.env.AKASHA_INDEX = previousIndex
+      }
+      await rm(dir, { recursive: true, force: true })
+    }
   })
 })
 

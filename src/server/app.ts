@@ -3,7 +3,7 @@ import { Elysia } from "elysia"
 import { loadRcloneConf } from "../config/rclone.ts"
 import { BackendFault, CapsuleNotFound, ForbiddenKnowledge } from "../core/darshan.ts"
 import { InvalidGnosis } from "../core/gnosis.ts"
-import { LocalDarshan, S3Darshan } from "../engines/index.ts"
+import { createAkademiya } from "../engines/index.ts"
 import { routes } from "./routes.ts"
 import type { AkashaError } from "./schemas.ts"
 import { web } from "./static.ts"
@@ -82,8 +82,9 @@ export function buildApp(surasthana: Surasthana) {
  */
 export async function bootApp() {
   const configPath = process.env.AKASHA_CONFIG ?? "rclone.conf"
+  const indexPath = process.env.AKASHA_INDEX
   const remotes = await loadRcloneConf(configPath)
-  const surasthana = buildSurasthana(remotes, [LocalDarshan, S3Darshan])
+  const surasthana = buildSurasthana(remotes, createAkademiya(), indexPath)
   return buildApp(surasthana)
 }
 
@@ -92,6 +93,7 @@ export type App = ReturnType<typeof buildApp>
 // Boot when run directly (`bun run src/server/app.ts`).
 if (import.meta.main) {
   const app = await bootApp()
-  app.listen(3000)
+  const port = Number.parseInt(process.env.PORT ?? "3000", 10)
+  app.listen(Number.isFinite(port) ? port : 3000)
   console.log(`Akasha listening on http://localhost:${app.server?.port}`)
 }

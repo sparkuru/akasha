@@ -27,6 +27,104 @@ environment (`Dockerfile`, `compose.yaml`):
 - Installs retry (flaky-network resilience): bun's strict integrity check fails
   hard on corrupted tarballs, so install loops are wrapped with retries.
 
+## Scenario: Docker production deployment
+
+### 1. Scope / Trigger
+
+- Trigger: changing runtime image, Compose deployment, environment variables,
+  mounted config/data paths, or server boot wiring.
+
+### 2. Signatures
+
+- Dev quality gate: `docker compose run --rm verify`
+- Production build: `docker compose -f compose.prod.yaml build`
+- Production start: `docker compose -f compose.prod.yaml up -d`
+- Production service name: `akasha`
+- Image name: `akasha:prod`
+
+### 3. Contracts
+
+Environment variables:
+
+| Name | Required | Default | Purpose |
+|---|---:|---|---|
+| `PORT` | no | `3000` | Elysia listen port inside the container |
+| `AKASHA_CONFIG` | yes in prod | `/config/rclone.conf` | rclone-compatible config path |
+| `AKASHA_INDEX` | no | `/data/irminsul.json` in prod | persisted index path |
+| `AKASHA_PORT` | no | `3000` | host port published by Compose |
+
+Production mounts:
+
+| Host path / volume | Container path | Mode | Purpose |
+|---|---|---|---|
+| `./deploy/config/rclone.conf` | `/config/rclone.conf` | read-only | backend config |
+| `akasha_data` | `/data` | read-write | index/local storage data |
+
+Image build contract:
+
+- `Dockerfile` keeps a `dev` target for bind-mounted development and a `prod`
+  target for deployment.
+- The production image must contain `src/frontend/dist/main.js`; build it with
+  `bun run build:web` during `docker build`.
+- Production deployment must not bind-mount the entire repo.
+
+### 4. Validation & Error Matrix
+
+| Condition | Expected result |
+|---|---|
+| Missing/invalid config file | container starts but API boot fails; fix mounted config |
+| `/api/remotes` healthcheck fails | container becomes unhealthy |
+| Frontend bundle missing | `/assets/main.js` smoke test fails |
+| `PORT` is non-numeric | app falls back to `3000` |
+| New engine registered only in tests | `bootApp` test must fail until it uses `createAkademiya()` |
+
+### 5. Good/Base/Bad Cases
+
+- Good: `compose.prod.yaml` uses the `prod` target, read-only config mount,
+  writable data volume, restart policy, and healthcheck.
+- Base: `compose.yaml` remains the development/verification entrypoint using the
+  `dev` target and repo bind mount.
+- Bad: installing Bun/npm packages on the host, bind-mounting the whole repo in
+  production, or starting production without building the Web UI bundle.
+
+### 6. Tests Required
+
+- `docker compose run --rm verify`
+- `docker compose -f compose.prod.yaml build`
+- `docker compose -f compose.prod.yaml up -d`
+- Smoke tests:
+  - `GET /api/remotes` returns 200.
+  - `GET /` returns the SPA shell.
+  - `GET /assets/main.js` returns 200.
+  - Docker health state is `healthy`.
+- Unit test: `bootApp()` uses the built-in registry, including all currently
+  built-in engines.
+
+### 7. Wrong vs Correct
+
+#### Wrong
+
+```yaml
+services:
+  app:
+    volumes:
+      - .:/app
+    command: bun run dev
+```
+
+#### Correct
+
+```yaml
+services:
+  akasha:
+    build:
+      context: .
+      target: prod
+    volumes:
+      - ./deploy/config/rclone.conf:/config/rclone.conf:ro
+      - akasha_data:/data
+```
+
 ## Testing rules
 
 - **`LocalDarshan` is the zero-network test backend.** Core and service tests run
