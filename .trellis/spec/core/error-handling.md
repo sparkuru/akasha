@@ -1,34 +1,61 @@
 # Error Handling
 
-> **Status: To fill once M1 code lands.** The shapes below are decided in
-> `session.md`; the concrete throw/catch/log conventions get documented after
-> the code exists.
+> Conventions derived from the agreed `session.md` design. Revisit against real
+> code when M1 lands.
 
-## Decided contracts
+## Error model
 
-- **`ForbiddenKnowledge`** — the "not supported / refused" error, thrown by the
-  core/engine layers (e.g. unknown `type` in `Akademiya.summon`, or a capability
-  the engine lacks). Defined in `core/darshan.ts`.
-- **Capability declaration, not exception probing** — UI/CLI read `clearance()`
-  to know up front which operations are available; do NOT discover capability by
-  try/catching a failed call.
-- **`AkashaError`** — the unified error structure returned at the Elysia boundary
-  (see [server guidelines](../server/elysia-guidelines.md)):
+Two distinct error surfaces:
 
-  ```ts
-  export interface AkashaError {
-    code: "forbidden_knowledge" | "invalid_gnosis" | "not_found" | "backend_error"
-    message: string
-    detail?: unknown
-  }
-  ```
+1. **Domain errors** thrown inside `core` / `engines` / `service`.
+2. **`AkashaError`** — the serialized shape returned at the Elysia boundary.
 
-## What to document once code exists
+The interface layer (`server/`) is the only place that converts (1) into (2).
 
-- Where each `code` is produced and how core exceptions map to it.
-- Whether engines throw typed errors or return results; the boundary that
-  converts vendor SDK errors into `backend_error`.
-- Validation errors: `invalid_gnosis` from `requiredGnosis()` checks vs. Elysia
-  schema rejection of external requests (two-layer validation, `session.md` §1).
-- Logging policy for caught-and-rethrown vs. swallowed errors
-  (cross-ref [logging is folded into server quality guidelines]).
+## Domain errors
+
+- **`ForbiddenKnowledge`** (defined in `core/darshan.ts`) — thrown for
+  "refused / not supported": unknown `type` in `Akademiya.summon`, or an
+  operation the engine does not implement. Extends `Error`, carries a stable
+  message.
+- **Invalid config** — `Akademiya.summon` validates `Gnosis` against
+  `requiredGnosis()` BEFORE constructing the engine; missing keys throw (maps to
+  `invalid_gnosis`).
+- **Capability declaration, not exception probing** — never discover whether an
+  operation is supported by try/catching it. Read `clearance()` first. Calling an
+  unsupported op is a programming error and may throw `ForbiddenKnowledge`.
+
+## `AkashaError` (boundary shape, decided)
+
+```ts
+export interface AkashaError {
+  code: "forbidden_knowledge" | "invalid_gnosis" | "not_found" | "backend_error"
+  message: string
+  detail?: unknown
+}
+```
+
+Mapping rules (applied in `server/`):
+
+| Source | `code` |
+|---|---|
+| `ForbiddenKnowledge` | `forbidden_knowledge` |
+| `requiredGnosis()` / `Gnosis` validation failure | `invalid_gnosis` |
+| object/bucket/remote not found | `not_found` |
+| vendor SDK / network / engine failure | `backend_error` |
+
+`detail` may carry the original error for logs; never put secrets
+(keys, tokens) in `message` or `detail`.
+
+## Engine error policy
+
+- Engines catch vendor SDK errors and rethrow as a domain error (or a typed
+  engine error) — the service layer must never see a raw `@aws-sdk` exception.
+- Distinguish "not found" from "backend error" so the boundary can map correctly.
+
+## Logging
+
+- Log at the boundary where an error is converted to `AkashaError`
+  (`backend_error` at `warn`/`error`, `not_found`/`invalid_gnosis` at `info`).
+- Do not log-and-rethrow at every layer (no duplicate stack spam). Log once,
+  at the conversion point. Redact credential fields from `Gnosis.raw`.

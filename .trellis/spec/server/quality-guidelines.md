@@ -1,26 +1,49 @@
 # Quality Guidelines
 
-> **Status: To fill once tooling is set up.** Bun is the runtime, package
-> manager, and test runner (`session.md` §1). Document the real commands and
-> standards after the project is scaffolded — do not invent CI rules that don't
-> run yet.
+> Conventions derived from the agreed `session.md` design (§1, §8, §9). Tooling
+> commands are provisional until the project is scaffolded — confirm and correct
+> when M1 lands.
 
-## What to document here
+## Tooling (Bun)
 
-- Test command (`bun test`), where tests live, naming (`*.test.ts`).
-- **`LocalDarshan` is the zero-network test backend** — core/service tests run
-  against it to prove the abstraction is vendor-clean (`session.md` M2).
-- Lint / format tooling once chosen (Biome / ESLint / Prettier — TBD) and the
-  exact commands.
-- Type-check gate (`tsc --noEmit` or `bun` equivalent).
-- What MUST have tests: `Akademiya` registration/summon, `seal`/`purify` path
-  guard, `irminsul.json` re-entry update, capability gating.
-- Review standards: enforce the layering hard-rules
-  (see [core directory-structure](../core/directory-structure.md)) and the
-  [naming theme](../core/naming-theme.md).
+- **Runtime / package manager / test runner: Bun.** No npm/yarn/pnpm, no Jest.
+- Test command: `bun test`. Tests live next to code as `*.test.ts`.
+- Type gate: `tsc --noEmit` (or `bun` equivalent) — zero errors before commit.
+- Lint/format: choose one toolchain (Biome preferred for a Bun project) and
+  pin the exact command here once set up. Do not mix multiple formatters.
 
-## Decided non-negotiables
+## Testing rules
 
-- No ElysiaJS / HTTP / vendor-SDK import below `server/` and `engines/`.
+- **`LocalDarshan` is the zero-network test backend.** Core and service tests run
+  against `local` to prove the abstraction is vendor-clean (`session.md` M2). No
+  test requires real cloud credentials.
+- Must have tests:
+  - `Akademiya` enroll/summon, including unknown-type → `ForbiddenKnowledge` and
+    missing-field → `invalid_gnosis`.
+  - `seal()` / `purify()` path guard, including `..` traversal rejection.
+  - `irminsul.json` re-entry: `first_indexed_at` preserved, `indexed_at` updated.
+  - capability gating: a missing capability is not offered / falls back.
+- S3 engine: test against a local S3-compatible mock (e.g. MinIO) or recorded
+  fixtures, not a live vendor bucket.
+
+## Review standards (enforced)
+
+These are hard-rules; a change violating them must be fixed before merge:
+
+- No ElysiaJS / HTTP / vendor-SDK import below `server/` and `engines/`
+  (see [core/directory-structure](../core/directory-structure.md)).
 - No duplicated browse/path/index logic between `cli/` and `server/`.
 - Capability declared via `clearance()`, never discovered by try/catch.
+- `clearance()` matches the optional methods the engine actually implements.
+- Config layer reads no backend-specific fields
+  (see [engines/config-compat](../engines/config-compat.md)).
+- Our own identifiers follow the [naming theme](../core/naming-theme.md);
+  external `type` values and protocol fields stay literal.
+- No secrets (keys, tokens, obscured passwords) in logs or error `detail`.
+
+## Pre-commit checklist
+
+1. `tsc --noEmit` clean.
+2. `bun test` green.
+3. Lint/format clean.
+4. Layering + naming review rules above hold.

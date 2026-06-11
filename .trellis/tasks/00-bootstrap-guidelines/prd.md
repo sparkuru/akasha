@@ -29,9 +29,15 @@ the rest conversationally.
 
 - [x] Restructure spec layers to match the project architecture
 - [x] Fill decided conventions (`core/naming-theme.md`, `core/directory-structure.md`)
-- [ ] Fill remaining layer specs with real code examples — **deferred to M1**
-      (no application code exists yet; bootstrap forbids aspirational specs).
-      Skeletons are in place marked "To fill (needs code)".
+- [x] Fill all remaining layer specs (type-safety, error-handling,
+      engine-authoring, config-compat, service, elysia, quality) from the
+      `session.md` design.
+
+> **Caveat (decided by developer):** no application code exists yet, so the
+> filled specs are **plan-derived, not extracted from real code**. Each file is
+> headed "derived from session.md — revisit against real code when M1 lands".
+> This intentionally trades the bootstrap "no aspirational spec" rule for giving
+> sub-agents conventions from day one. Re-audit specs against actual code at M1.
 
 ---
 

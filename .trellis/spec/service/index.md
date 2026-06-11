@@ -7,7 +7,7 @@
 
 | Guide | Description | Status |
 |-------|-------------|--------|
-| [Service Guidelines](./service-guidelines.md) | Shared service rules, `seal`/`purify`, index format | To fill (needs code) |
+| [Service Guidelines](./service-guidelines.md) | Shared service rules, `seal`/`purify`, index format | Filled (from plan) |
 
 ## Layer rules (decided)
 

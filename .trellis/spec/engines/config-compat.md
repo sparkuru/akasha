@@ -1,40 +1,57 @@
 # Config Compatibility (rclone.conf)
 
-> **Status: To fill once the config parser lands.** Decided shape and rules are
-> below (`session.md` §4, reference §D); concrete parsing conventions follow the
-> real implementation.
+> Conventions derived from the agreed `session.md` design (§4, reference §D).
+> Revisit against the real parser when it lands.
 
-## Decided rules
+## Core rule: fields are delegated to engines
 
-- Keep rclone.conf compatibility (INI + `type`), but **do not hard-read S3 fields
-  in the config layer.** Field interpretation is delegated to engines — this is
-  the prerequisite for supporting arbitrary backends.
+Keep rclone.conf compatibility (INI + `type`), but the config layer must
+**never hard-read backend-specific fields**. It parses each section into a
+neutral `Gnosis` and hands `raw` to the engine. This is the prerequisite for
+supporting arbitrary backends.
 
-  ```ts
-  export interface Gnosis {
-    name: string
-    type: string
-    raw: Record<string, string>
-  }
-  ```
+```ts
+export interface Gnosis {
+  name: string                  // section name, e.g. "genie"
+  type: string                  // the rclone `type` value, verbatim
+  raw: Record<string, string>   // every other key in the section, untouched
+}
+```
 
-- Per-engine field reads (each from `raw`, no cross-talk):
-  - `S3Darshan`: `access_key_id / secret_access_key / endpoint / region / force_path_style`
-  - `WebdavDarshan`: `url / user / pass`
-  - `LocalDarshan`: `root`
+## Parsing rules
 
-- **obscure vs plaintext:** rclone obscures password/token fields; S3 access keys
-  are plaintext. MVP may support only plaintext / S3 keys; password backends need
-  a rclone `reveal` implementation in a later phase.
+- Parse **every** section regardless of `type`. An unknown/unsupported `type`
+  (sftp, drive, crypt) must still produce a valid `Gnosis`; it only fails later
+  if someone tries to `summon` an engine that isn't registered.
+- Preserve all keys verbatim in `raw` — do not drop, rename, or coerce.
+- `type` is required; a section without it is a parse error.
+- Field interpretation belongs to the engine's constructor + `requiredGnosis()`,
+  not here.
 
-## Input samples to stay compatible with
+## Per-engine field reads (each from `raw`, no cross-talk)
 
-See `session.md` reference §D for real `[genie]` (s3), `[myserver]` (sftp),
-`[nutstore]` (webdav), `[gdrive]` (drive/OAuth), `[secret]` (crypt) sections.
-Non-S3 sections must parse without error even if the engine isn't built yet.
+| Engine | keys read from `raw` |
+|---|---|
+| `S3Darshan` | `access_key_id`, `secret_access_key`, `endpoint`, `region`, `force_path_style` |
+| `WebdavDarshan` | `url`, `user`, `pass` |
+| `LocalDarshan` | `root` |
 
-## What to document once code exists
+## obscure vs plaintext
 
-- INI parser choice and how repeated/quoted values are handled.
-- How unknown `type` sections are surfaced (parse-but-defer vs. reject).
-- Test fixtures: a sample rclone.conf with each backend shape.
+rclone obscures password/token fields (sftp `pass`, webdav `pass`, drive `token`,
+crypt `password`); S3 access keys are plaintext. MVP supports plaintext / S3 keys
+only. Password backends need a rclone `reveal` implementation — deferred to the
+extension phase. Until then, surface a clear error rather than sending an
+obscured value as if it were plaintext.
+
+## Compatibility fixtures
+
+A test rclone.conf must include each shape from `session.md` reference §D:
+`[genie]` (s3, plaintext), `[myserver]` (sftp, obscured), `[nutstore]` (webdav),
+`[gdrive]` (drive/OAuth JSON token), `[secret]` (crypt nested on another remote).
+All must parse without error even when the matching engine isn't built.
+
+## Index persistence note
+
+The on-disk index default is `irminsul.json`; its format is owned by the service
+layer (see [service-guidelines](../service/service-guidelines.md)), not config.

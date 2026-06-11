@@ -7,8 +7,8 @@
 
 | Guide | Description | Status |
 |-------|-------------|--------|
-| [Elysia Guidelines](./elysia-guidelines.md) | Routes, schema validation, OpenAPI, error mapping, CLI parity | To fill (needs code) |
-| [Quality Guidelines](./quality-guidelines.md) | Bun test, lint, what must be tested | To fill (needs code) |
+| [Elysia Guidelines](./elysia-guidelines.md) | Routes, schema validation, OpenAPI, error mapping, CLI parity | Filled (from plan) |
+| [Quality Guidelines](./quality-guidelines.md) | Bun test, lint, what must be tested | Filled (from plan) |
 
 ## Layer rules (decided)
 

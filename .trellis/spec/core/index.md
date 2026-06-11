@@ -27,8 +27,8 @@ All backend differences are sealed inside `engines/`.
 |-------|-------------|--------|
 | [Directory Structure](./directory-structure.md) | `src/` layout and the layering hard-rule | Filled (decided) |
 | [Naming Theme](./naming-theme.md) | Akasha imagery naming convention (mandatory) | Filled (decided) |
-| [Type Safety](./type-safety.md) | TypeScript conventions, type organization | To fill (needs code) |
-| [Error Handling](./error-handling.md) | `ForbiddenKnowledge`, `AkashaError`, capability-not-exception | To fill (needs code) |
+| [Type Safety](./type-safety.md) | TypeScript conventions, type organization | Filled (from plan) |
+| [Error Handling](./error-handling.md) | `ForbiddenKnowledge`, `AkashaError`, capability-not-exception | Filled (from plan) |
 
 ---
 

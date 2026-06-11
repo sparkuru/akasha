@@ -7,8 +7,8 @@
 
 | Guide | Description | Status |
 |-------|-------------|--------|
-| [Engine Authoring](./engine-authoring.md) | How to write a new `Darshan` (contract, `enroll`, `clearance`) | To fill (needs code) |
-| [Config Compatibility](./config-compat.md) | rclone.conf field delegation, `Gnosis.raw` parsing | To fill (needs code) |
+| [Engine Authoring](./engine-authoring.md) | How to write a new `Darshan` (contract, `enroll`, `clearance`) | Filled (from plan) |
+| [Config Compatibility](./config-compat.md) | rclone.conf field delegation, `Gnosis.raw` parsing | Filled (from plan) |
 
 ## Layer rules (decided)
 
