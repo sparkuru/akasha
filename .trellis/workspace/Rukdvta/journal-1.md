@@ -304,3 +304,36 @@ Added a production Docker target and Compose deployment, built frontend assets i
 ### Next Steps
 
 - None - task complete
+
+
+## Session 10: Manual bucket path entry
+
+**Date**: 2026-06-11
+**Task**: Manual bucket path entry
+**Branch**: `the-year-of-the-dove`
+
+### Summary
+
+Changed the Web UI so selecting a remote shows a manual bucket/prefix input instead of auto-calling listBuckets, added explicit bucket listing, tests, and redeployed the production Docker image.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `23ecbb7` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
