@@ -105,3 +105,36 @@ Implemented milestone M1: scaffolded the from-scratch Bun + ElysiaJS + TypeScrip
 ### Next Steps
 
 - None - task complete
+
+
+## Session 4: M2: LocalDarshan, rclone.conf parser, CLI
+
+**Date**: 2026-06-11
+**Task**: M2: LocalDarshan, rclone.conf parser, CLI
+**Branch**: `the-year-of-the-dove`
+
+### Summary
+
+Implemented milestone M2: shipped the first real engine (LocalDarshan, zero-network) end to end to prove the core abstraction is vendor-clean. Added a hand-rolled rclone.conf INI parser (config/rclone.ts → Gnosis[], MalformedGnosis), LocalDarshan over the local fs (root→virtual bucket, clearance without presign), createAkademiya() factory, the service layer (path seal/purify traversal guard, browser remote:bucket/prefix parsing + capability-gated list/read, house-of-wisdom irminsul.json snapshots with first_indexed_at preserved), and a citty CLI (remotes/ls/cat/recall with --config). 34 zero-network tests pass; verified green in-container (tsc/bun test/biome) and via CLI smoke test. trellis-check passed all 7 spec dimensions. No S3 SDK or Elysia in the M2 path. Synced specs (config/ dir, MalformedGnosis, createAkademiya); added citty dep.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `183e2b6` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
