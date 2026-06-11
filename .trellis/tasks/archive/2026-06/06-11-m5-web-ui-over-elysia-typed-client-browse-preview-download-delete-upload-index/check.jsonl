@@ -1,0 +1,6 @@
+{"file": ".trellis/tasks/06-11-m5-web-ui-over-elysia-typed-client-browse-preview-download-delete-upload-index/research/elysia-eden-frontend.md", "reason": "Verify treaty usage, route->treaty mapping, t.File upload, and same-origin static-serve match the verified eden 1.4.9 contract; verify Tier A/B/C tests stay zero-network as specified"}
+{"file": ".trellis/spec/guides/cross-layer-thinking-guide.md", "reason": "Verify frontend depends only on the typed API (import type App) and never reaches into core/engines/service/server internals"}
+{"file": ".trellis/spec/server/elysia-guidelines.md", "reason": "Verify the UI consumes the typed contract exclusively, reflects clearance for capability-gating (not try/catch probing), and surfaces errors via the mapped boundary"}
+{"file": ".trellis/spec/server/quality-guidelines.md", "reason": "Verify the layer quality bar: zero-network tests, no leaked SDK/stack/secret, schema-as-contract respected by the UI"}
+{"file": ".trellis/spec/core/error-handling.md", "reason": "Verify the UI surfaces AkashaError (code/message) with no raw stacks/secrets and branches correctly on the code taxonomy"}
+{"file": ".trellis/spec/core/type-safety.md", "reason": "Verify strict typing across the Eden client and UI logic functions; no any/unchecked casts"}
