@@ -38,3 +38,37 @@ Rewrote session.md to plan Akasha as a from-scratch Bun + ElysiaJS + TypeScript 
 ### Next Steps
 
 - None - task complete
+
+
+## Session 2: Restructure & fill Trellis spec for Akasha (Bun/Elysia)
+
+**Date**: 2026-06-11
+**Task**: Restructure & fill Trellis spec for Akasha (Bun/Elysia)
+**Branch**: `the-year-of-the-dove`
+
+### Summary
+
+Replaced the generic backend/React-frontend spec scaffold with Akasha layers (core/engines/service/server) matching the Bun + ElysiaJS architecture, then filled all layer specs from the session.md design: directory-structure, naming-theme, type-safety, error-handling, engine-authoring, config-compat, service-guidelines, elysia-guidelines, quality-guidelines. Specs are plan-derived (no app code yet) and headed to be re-audited at M1. Completed and archived the 00-bootstrap-guidelines task.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `ed23127` | (see git log) |
+| `871b5ee` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
