@@ -4,6 +4,7 @@ import { appWith, readOnly, s3like } from "../server/fake-darshan.ts"
 import {
   type AkashaClient,
   can,
+  capsuleFromStat,
   deleteObject,
   errorText,
   listBuckets,
@@ -11,6 +12,7 @@ import {
   listRemotes,
   makeRef,
   objectUrl,
+  shouldTryObjectFallback,
   uploadObject,
 } from "./logic.ts"
 
@@ -30,6 +32,50 @@ describe("can() — capability gating", () => {
     const full = { name: "s3r", type: "fake", clearance: ["upload", "delete"] as const }
     expect(can({ ...full, clearance: [...full.clearance] }, "upload")).toBe(true)
     expect(can({ name: "ro", type: "fake", clearance: ["read"] }, "upload")).toBe(false)
+  })
+})
+
+describe("makeRef() — manual path normalization", () => {
+  it("accepts bucket paths, internal refs, and rclone-style full paths", () => {
+    expect(makeRef("genie", "aidea-ota/a2d/FOTA/file.bin")).toBe(
+      "genie:aidea-ota/a2d/FOTA/file.bin",
+    )
+    expect(makeRef("genie", "genie:aidea-ota/a2d/FOTA/file.bin")).toBe(
+      "genie:aidea-ota/a2d/FOTA/file.bin",
+    )
+    expect(makeRef("genie", "genie://aidea-ota/a2d/FOTA/file.bin")).toBe(
+      "genie:aidea-ota/a2d/FOTA/file.bin",
+    )
+  })
+})
+
+describe("object fallback helpers", () => {
+  it("tries exact-object fallback only for empty non-directory refs", () => {
+    expect(shouldTryObjectFallback("genie:aidea-ota/a.bin", [])).toBe(true)
+    expect(shouldTryObjectFallback("genie:aidea-ota/dir/", [])).toBe(false)
+    expect(shouldTryObjectFallback("genie:", [])).toBe(false)
+    expect(
+      shouldTryObjectFallback("genie:aidea-ota/a.bin", [
+        { key: "a.bin", name: "a.bin", isDir: false },
+      ]),
+    ).toBe(false)
+  })
+
+  it("turns object metadata into a single table capsule", () => {
+    expect(
+      capsuleFromStat("genie:aidea-ota/a2d/FOTA/file.bin", {
+        key: "a2d/FOTA/file.bin",
+        isDir: false,
+        size: 42,
+        etag: "abc",
+      }),
+    ).toEqual({
+      key: "a2d/FOTA/file.bin",
+      name: "file.bin",
+      isDir: false,
+      size: 42,
+      etag: "abc",
+    })
   })
 })
 

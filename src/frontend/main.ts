@@ -3,6 +3,7 @@ import {
   type Capsule,
   type Outcome,
   type Remote,
+  capsuleFromStat,
   deleteObject,
   listBuckets,
   listObjects,
@@ -11,6 +12,8 @@ import {
   objectUrl,
   readIndex,
   recallIndex,
+  shouldTryObjectFallback,
+  statObject,
   uploadObject,
 } from "./logic.ts"
 import {
@@ -93,17 +96,21 @@ async function showBuckets(remote: Remote): Promise<void> {
 
 function remotePathEntry(remote: Remote): HTMLElement {
   return renderPathEntry(remote, {
-    onOpen: (path) => void openRef(makeRef(remote.name, path)),
+    onOpen: (path) => void openRef(makeRef(remote.name, path), { objectFallback: true }),
     onListBuckets: () => void showBuckets(remote),
   })
 }
 
-async function openRef(ref: string): Promise<void> {
+async function openRef(ref: string, options: { objectFallback?: boolean } = {}): Promise<void> {
   const remote = state.remote
   if (!remote) return
   state.ref = ref
   const capsules = take(await listObjects(client, ref))
   if (!capsules) return
+  if (options.objectFallback === true && shouldTryObjectFallback(ref, capsules)) {
+    const openedObject = await openObjectRef(remote, ref)
+    if (openedObject) return
+  }
   const toolbar = renderToolbar(
     remote,
     (file) => upload(ref, file),
@@ -115,6 +122,20 @@ async function openRef(ref: string): Promise<void> {
     onDelete: (capsule) => remove(childRef(ref, capsule)),
   })
   main.replaceChildren(el("h2", {}, ref), remotePathEntry(remote), toolbar, table)
+}
+
+async function openObjectRef(remote: Remote, ref: string): Promise<boolean> {
+  const stat = await statObject(client, ref)
+  if (!stat.ok) return false
+  clearError()
+  const capsule = capsuleFromStat(ref, stat.value)
+  const table = renderObjectTable(remote, [capsule], {
+    onOpen: () => download(ref),
+    onDownload: () => download(ref),
+    onDelete: () => remove(ref),
+  })
+  main.replaceChildren(el("h2", {}, ref), remotePathEntry(remote), table)
+  return true
 }
 
 /** Join a directory ref with a child entry's name. */

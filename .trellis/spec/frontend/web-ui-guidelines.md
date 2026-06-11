@@ -46,6 +46,12 @@ Served by `src/server/static.ts` (the `web` Elysia plugin), mounted **after**
   buckets, even when the engine type generally supports `list_buckets`. The UI
   should render a manual `bucket/prefix` entry first, and expose bucket listing
   only as an explicit action for remotes that declare `list_buckets`.
+- Manual path entry accepts both `bucket/prefix` and full rclone-style
+  `remote://bucket/prefix` input for the selected remote. Normalize this in
+  `logic.ts` before calling typed APIs; the service layer continues to receive
+  the internal `remote:bucket/prefix` ref. If a manual open returns an empty
+  directory listing for a non-directory ref, stat the exact object and render a
+  single file row so direct object keys are actionable.
 
 ## Error surfacing
 

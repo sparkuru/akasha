@@ -76,9 +76,40 @@ export function errorText(error: AkashaError): string {
   }
 }
 
-/** Build a `remote:bucket/prefix` ref from parts (no leading/trailing slash noise). */
+/** Build a `remote:bucket/prefix` ref from manual input. */
 export function makeRef(remote: string, path: string): string {
-  return `${remote}:${path.replace(/^\/+/, "")}`
+  const input = path.trim()
+  if (input.startsWith(`${remote}:`)) {
+    return `${remote}:${input.slice(remote.length + 1).replace(/^\/+/, "")}`
+  }
+  if (input.startsWith(`${remote}://`)) {
+    return `${remote}:${input.slice(remote.length + 3).replace(/^\/+/, "")}`
+  }
+  return `${remote}:${input.replace(/^\/+/, "")}`
+}
+
+export function shouldTryObjectFallback(ref: string, capsules: readonly Capsule[]): boolean {
+  return capsules.length === 0 && !ref.endsWith(":") && !ref.endsWith("/")
+}
+
+export function capsuleFromStat(ref: string, stat: Record<string, unknown>): Capsule {
+  const key = typeof stat.key === "string" ? stat.key : ref.slice(ref.indexOf(":") + 1)
+  const name = key.split("/").filter(Boolean).at(-1) ?? key
+  const capsule: Capsule = {
+    key,
+    name,
+    isDir: stat.isDir === true,
+  }
+  if (typeof stat.size === "number") {
+    capsule.size = stat.size
+  }
+  for (const field of ["lastModified", "etag", "storageClass"] as const) {
+    const value = stat[field]
+    if (typeof value === "string") {
+      capsule[field] = value
+    }
+  }
+  return capsule
 }
 
 /** Narrow a treaty failure into our `Outcome` error arm. */
