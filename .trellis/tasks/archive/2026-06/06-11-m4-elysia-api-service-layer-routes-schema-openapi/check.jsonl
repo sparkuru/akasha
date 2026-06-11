@@ -1,0 +1,5 @@
+{"file": ".trellis/spec/server/elysia-guidelines.md", "reason": "Verify server stays adapter-only (no browse/path/index logic), all 10 routes present, typed App exported, errors mapped, clearance surfaced"}
+{"file": ".trellis/spec/server/quality-guidelines.md", "reason": "Verify server-layer quality bar: zero-network tests, no leaked SDK/stack/secret, schema-as-contract"}
+{"file": ".trellis/spec/service/service-guidelines.md", "reason": "Verify service extension path-guards every key, gates on clearance, implements presign proxy fallback, and summons engines via Akademiya"}
+{"file": ".trellis/spec/core/error-handling.md", "reason": "Verify .onError mapping matches the code table (not_found/forbidden/invalid_gnosis/backend_error) and no secret leakage"}
+{"file": ".trellis/spec/core/type-safety.md", "reason": "Verify strict typing across service methods, schemas, and the Eden-consumed App type; no any/unchecked casts"}

@@ -1,0 +1,7 @@
+{"file": ".trellis/spec/server/elysia-guidelines.md", "reason": "Server-as-adapter rules, the decided 10-route plan, two-layer validation, typed-contract/Eden, unified error mapping, capability surfacing"}
+{"file": ".trellis/spec/server/quality-guidelines.md", "reason": "Server-layer quality bar the new routes/schemas/tests must meet"}
+{"file": ".trellis/spec/service/service-guidelines.md", "reason": "Service owns browse/path/index; path.ts seal/purify guard, capability gating not exception probing, presign proxy fallback, summon via Akademiya — drives the service extension"}
+{"file": ".trellis/spec/core/error-handling.md", "reason": "Domain error taxonomy + AkashaError boundary shape and not_found vs backend_error mapping for .onError -> HTTP status"}
+{"file": ".trellis/spec/core/naming-theme.md", "reason": "Surasthana/Akademiya/Browser naming theme; class names themed but route literals stay plain"}
+{"file": ".trellis/spec/core/type-safety.md", "reason": "Strict typing conventions for service methods, Elysia t schemas, and the exported App type"}
+{"file": ".trellis/tasks/06-11-m4-elysia-api-service-layer-routes-schema-openapi/research/elysia-1x-conventions.md", "reason": "Elysia 1.4 implementation recipes: @elysiajs/openapi, Eden treaty, t.File upload, .decorate Surasthana, .error/.onError mapping, app.handle zero-network tests; flags the 1.1->1.4 pin bump"}
