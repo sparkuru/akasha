@@ -8,7 +8,7 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 10
+- **Total Sessions**: 11
 - **Last Active**: 2026-06-11
 <!-- @@@/auto:current-status -->
 
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~339 | Active |
+| `journal-1.md` | ~372 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 11 | 2026-06-11 | Full rclone object path entry | `47af7b5` | `the-year-of-the-dove` |
 | 10 | 2026-06-11 | Manual bucket path entry | `23ecbb7` | `the-year-of-the-dove` |
 | 9 | 2026-06-11 | Docker production deployment | `047732a` | `the-year-of-the-dove` |
 | 8 | 2026-06-11 | M6 WebdavDarshan engine | `0ed3a2a` | `the-year-of-the-dove` |

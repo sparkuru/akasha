@@ -337,3 +337,36 @@ Changed the Web UI so selecting a remote shows a manual bucket/prefix input inst
 ### Next Steps
 
 - None - task complete
+
+
+## Session 11: Full rclone object path entry
+
+**Date**: 2026-06-11
+**Task**: Full rclone object path entry
+**Branch**: `the-year-of-the-dove`
+
+### Summary
+
+Fixed Web UI manual path entry so selected remotes accept both bucket/prefix and remote://bucket/prefix input. Empty directory listings from manual non-directory refs now stat the exact object and render an actionable file row; verified with Docker and deployed against the known genie S3 object.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `47af7b5` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
