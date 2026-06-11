@@ -41,6 +41,11 @@ Served by `src/server/static.ts` (the `web` Elysia plugin), mounted **after**
 - Download needs `download` **or** `presign`; upload needs `upload`; delete needs
   `delete`. A lacking capability → the control is disabled or omitted, matching the
   server-side gate (a forbidden call still 403s, but the UI never relies on that).
+- Selecting a remote must not automatically call `listBuckets()`. Some S3
+  credentials can list/read a specific `bucket/prefix` but cannot list all
+  buckets, even when the engine type generally supports `list_buckets`. The UI
+  should render a manual `bucket/prefix` entry first, and expose bucket listing
+  only as an explicit action for remotes that declare `list_buckets`.
 
 ## Error surfacing
 

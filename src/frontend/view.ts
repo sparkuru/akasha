@@ -54,6 +54,35 @@ export function renderRemoteList(
   return list
 }
 
+export interface PathEntryHandlers {
+  onOpen: (path: string) => void
+  onListBuckets?: () => void
+}
+
+/** Manual `bucket/prefix` entry; avoids requiring list_buckets clearance. */
+export function renderPathEntry(remote: Remote, handlers: PathEntryHandlers): HTMLElement {
+  const form = el("form", { class: "path-entry" })
+  const input = el("input", {
+    type: "text",
+    class: "path-input",
+    name: "path",
+    placeholder: "bucket/prefix",
+    autocomplete: "off",
+  })
+  const open = el("button", { type: "submit", class: "path-open" }, "Open")
+  form.addEventListener("submit", (event) => {
+    event.preventDefault()
+    handlers.onOpen(input.value.trim())
+  })
+  form.append(input, open)
+  if (can(remote, "list_buckets") && handlers.onListBuckets !== undefined) {
+    const buckets = el("button", { type: "button", class: "list-buckets" }, "Buckets")
+    buckets.addEventListener("click", () => handlers.onListBuckets?.())
+    form.append(buckets)
+  }
+  return form
+}
+
 /** Handlers wired by the controller; each receives the row's full ref. */
 export interface ObjectHandlers {
   onOpen: (capsule: Capsule) => void

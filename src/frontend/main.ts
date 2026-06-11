@@ -18,6 +18,7 @@ import {
   renderError,
   renderIndex,
   renderObjectTable,
+  renderPathEntry,
   renderPreview,
   renderRemoteList,
   renderToolbar,
@@ -41,7 +42,10 @@ const banner = el("div", { id: "banner" })
 root.append(banner, sidebar, main)
 
 /** Current navigation context. */
-const state: { remote?: Remote; ref?: string } = {}
+const state: { remote: Remote | undefined; ref: string | undefined } = {
+  remote: undefined,
+  ref: undefined,
+}
 
 function showError(error: Parameters<typeof renderError>[0]): void {
   banner.replaceChildren(renderError(error))
@@ -69,19 +73,29 @@ async function refreshRemotes(): Promise<void> {
 
 async function selectRemote(remote: Remote): Promise<void> {
   state.remote = remote
-  if (remote.clearance.includes("list_buckets")) {
-    const buckets = take(await listBuckets(client, remote.name))
-    if (!buckets) return
-    const list = el("ul", { class: "buckets" })
-    for (const bucket of buckets) {
-      const button = el("button", { type: "button", class: "bucket" }, bucket)
-      button.addEventListener("click", () => openRef(makeRef(remote.name, bucket)))
-      list.append(el("li", {}, button))
-    }
-    main.replaceChildren(el("h2", {}, `${remote.name} buckets`), list)
-  } else {
-    await openRef(makeRef(remote.name, ""))
+  state.ref = undefined
+  clearError()
+  main.replaceChildren(el("h2", {}, remote.name), remotePathEntry(remote))
+}
+
+async function showBuckets(remote: Remote): Promise<void> {
+  state.remote = remote
+  const buckets = take(await listBuckets(client, remote.name))
+  if (!buckets) return
+  const list = el("ul", { class: "buckets" })
+  for (const bucket of buckets) {
+    const button = el("button", { type: "button", class: "bucket" }, bucket)
+    button.addEventListener("click", () => openRef(makeRef(remote.name, bucket)))
+    list.append(el("li", {}, button))
   }
+  main.replaceChildren(el("h2", {}, `${remote.name} buckets`), remotePathEntry(remote), list)
+}
+
+function remotePathEntry(remote: Remote): HTMLElement {
+  return renderPathEntry(remote, {
+    onOpen: (path) => void openRef(makeRef(remote.name, path)),
+    onListBuckets: () => void showBuckets(remote),
+  })
 }
 
 async function openRef(ref: string): Promise<void> {
@@ -100,7 +114,7 @@ async function openRef(ref: string): Promise<void> {
     onDownload: (capsule) => download(childRef(ref, capsule)),
     onDelete: (capsule) => remove(childRef(ref, capsule)),
   })
-  main.replaceChildren(el("h2", {}, ref), toolbar, table)
+  main.replaceChildren(el("h2", {}, ref), remotePathEntry(remote), toolbar, table)
 }
 
 /** Join a directory ref with a child entry's name. */
