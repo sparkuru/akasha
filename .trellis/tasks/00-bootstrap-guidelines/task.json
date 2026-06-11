@@ -21,9 +21,11 @@
   "children": [],
   "parent": null,
   "relatedFiles": [
-    ".trellis/spec/backend/",
-    ".trellis/spec/frontend/"
+    ".trellis/spec/core/",
+    ".trellis/spec/engines/",
+    ".trellis/spec/service/",
+    ".trellis/spec/server/"
   ],
-  "notes": "First-time setup task created by trellis init (fullstack project)",
+  "notes": "First-time setup task created by trellis init. Spec scaffold restructured from generic backend/frontend to Akasha layers (core/engines/service/server) matching the Bun + ElysiaJS architecture in session.md.",
   "meta": {}
 }

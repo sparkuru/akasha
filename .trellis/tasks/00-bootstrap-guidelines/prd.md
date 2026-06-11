@@ -21,9 +21,17 @@ the rest conversationally.
 
 ## Status (update the checkboxes as you complete each item)
 
-- [ ] Fill backend guidelines
-- [ ] Fill frontend guidelines
-- [ ] Add code examples
+> **Restructured (2026-06-11):** the generic `backend/` + React `frontend/`
+> scaffold was replaced with Akasha layers — `core / engines / service / server`
+> — matching the Bun + ElysiaJS architecture in `session.md`. The tables further
+> down still list the old generic files; the authoritative layout is now each
+> layer's `index.md` under `.trellis/spec/`.
+
+- [x] Restructure spec layers to match the project architecture
+- [x] Fill decided conventions (`core/naming-theme.md`, `core/directory-structure.md`)
+- [ ] Fill remaining layer specs with real code examples — **deferred to M1**
+      (no application code exists yet; bootstrap forbids aspirational specs).
+      Skeletons are in place marked "To fill (needs code)".
 
 ---
 
