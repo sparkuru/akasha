@@ -1,0 +1,8 @@
+{"file": ".trellis/spec/engines/engine-authoring.md", "reason": "Darshan contract + authoring checklist LocalDarshan must satisfy; non-bucket virtual-bucket convention"}
+{"file": ".trellis/spec/engines/config-compat.md", "reason": "rclone.conf parse rules: parse every section, preserve raw verbatim, type required, LocalDarshan reads raw.root"}
+{"file": ".trellis/spec/service/service-guidelines.md", "reason": "browser/path/house-of-wisdom responsibilities, seal/purify, irminsul.json format, capability gating"}
+{"file": ".trellis/spec/core/directory-structure.md", "reason": "src/ layout for config/engines/service/cli and the one-way layering hard-rules"}
+{"file": ".trellis/spec/core/naming-theme.md", "reason": "Akasha naming for LocalDarshan, recall/query, seal/purify, HouseOfWisdom; type key 'local' stays literal"}
+{"file": ".trellis/spec/core/error-handling.md", "reason": "ForbiddenKnowledge for unsupported ops (presign), InvalidGnosis for missing root"}
+{"file": ".trellis/spec/core/type-safety.md", "reason": "tsconfig strict rules, interface-vs-type, no any; Capsule shape for list results"}
+{"file": ".trellis/spec/server/quality-guidelines.md", "reason": "Bun test + Biome (src-scoped) + Docker verify; LocalDarshan is the zero-network test backend; required tests"}

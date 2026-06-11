@@ -17,7 +17,9 @@
 2. An engine reads only the `Gnosis.raw` keys it needs; the config layer stays
    backend-agnostic.
 3. Adding an engine = new file under `src/engines/` + one `enroll` in
-   `engines/index.ts`. No upper-layer change.
+   `engines/index.ts`. No upper-layer change. The factory is
+   `createAkademiya()` (added M2) — it constructs an `Akademiya` and enrolls all
+   built-in engines; callers (CLI/server) use it instead of `new Akademiya()`.
 
 ---
 

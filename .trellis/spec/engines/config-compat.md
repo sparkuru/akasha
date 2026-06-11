@@ -24,7 +24,10 @@ export interface Gnosis {
   (sftp, drive, crypt) must still produce a valid `Gnosis`; it only fails later
   if someone tries to `summon` an engine that isn't registered.
 - Preserve all keys verbatim in `raw` — do not drop, rename, or coerce.
-- `type` is required; a section without it is a parse error.
+- `type` is required; a section without it is a parse error
+  (`MalformedGnosis`, added at M2 in `config/rclone.ts`).
+- Implemented at M2: `parseRcloneConf(text) → Gnosis[]` + `loadRcloneConf(path)`;
+  hand-rolled (no dependency), supports `#`/`;` comments and blank values.
 - Field interpretation belongs to the engine's constructor + `requiredGnosis()`,
   not here.
 

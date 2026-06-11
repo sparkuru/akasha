@@ -4,7 +4,11 @@
   "type": "module",
   "description": "Akasha — a vendor-clean object-storage browsing system (the Void System).",
   "module": "src/index.ts",
+  "bin": {
+    "akasha": "src/cli/terminal.ts"
+  },
   "scripts": {
+    "akasha": "bun run src/cli/terminal.ts",
     "dev": "bun run src/server/app.ts",
     "test": "bun test",
     "typecheck": "tsc --noEmit",
@@ -12,6 +16,7 @@
     "format": "biome format --write src"
   },
   "dependencies": {
+    "citty": "^0.1.6",
     "elysia": "^1.1.0"
   },
   "devDependencies": {

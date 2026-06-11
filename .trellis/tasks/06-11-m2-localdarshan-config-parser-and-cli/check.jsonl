@@ -1,0 +1,6 @@
+{"file": ".trellis/spec/engines/engine-authoring.md", "reason": "Verify LocalDarshan implements the contract, clearance() matches implemented methods, registered via enroll, virtual-bucket mapping"}
+{"file": ".trellis/spec/engines/config-compat.md", "reason": "Verify parser preserves raw verbatim, parses non-S3 sections, no backend fields hard-read in config layer"}
+{"file": ".trellis/spec/service/service-guidelines.md", "reason": "Verify seal/purify traversal guard, irminsul.json re-entry (first_indexed_at preserved), capability gating, presign fallback"}
+{"file": ".trellis/spec/core/directory-structure.md", "reason": "Verify layering: cli depends only on service/core; engines import nothing upward; no Elysia/S3 in local path"}
+{"file": ".trellis/spec/core/naming-theme.md", "reason": "Verify themed identifiers; literal type key 'local'"}
+{"file": ".trellis/spec/server/quality-guidelines.md", "reason": "Verify docker compose verify green, required zero-network tests present"}

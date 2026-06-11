@@ -12,8 +12,10 @@ src/
     darshan.ts              # Darshan interface, capability types, ForbiddenKnowledge
     gnosis.ts               # Gnosis type + config validation
     akademiya.ts            # registry / factory
+  config/
+    rclone.ts               # hand-rolled rclone.conf INI parser → Gnosis[] (MalformedGnosis on bad section)
   engines/
-    index.ts                # enroll built-in engines
+    index.ts                # createAkademiya(): enroll built-in engines (one line per engine)
     s3.ts                   # S3Darshan (covers s3/tos/oss/cos/minio/r2)
     local.ts                # LocalDarshan (local fs, zero-network tests)
     webdav.ts               # WebdavDarshan (extension phase)
