@@ -271,3 +271,36 @@ Implemented WebdavDarshan with native fetch, zero-network tests, registration, c
 ### Next Steps
 
 - None - task complete
+
+
+## Session 9: Docker production deployment
+
+**Date**: 2026-06-11
+**Task**: Docker production deployment
+**Branch**: `the-year-of-the-dove`
+
+### Summary
+
+Added a production Docker target and Compose deployment, built frontend assets in the image, wired runtime config/index env, deployed with Docker Compose, and verified health plus HTTP smoke tests.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `047732a` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete

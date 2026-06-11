@@ -8,7 +8,7 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 8
+- **Total Sessions**: 9
 - **Last Active**: 2026-06-11
 <!-- @@@/auto:current-status -->
 
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~273 | Active |
+| `journal-1.md` | ~306 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 9 | 2026-06-11 | Docker production deployment | `047732a` | `the-year-of-the-dove` |
 | 8 | 2026-06-11 | M6 WebdavDarshan engine | `0ed3a2a` | `the-year-of-the-dove` |
 | 7 | 2026-06-11 | M5: Web UI over Elysia typed client | `4b8d1f4` | `the-year-of-the-dove` |
 | 6 | 2026-06-11 | M4: Elysia API + service layer (routes, schema, OpenAPI) | `b0fe98e` | `the-year-of-the-dove` |
