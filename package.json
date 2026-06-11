@@ -1,0 +1,22 @@
+{
+  "name": "akasha",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Akasha — a vendor-clean object-storage browsing system (the Void System).",
+  "module": "src/index.ts",
+  "scripts": {
+    "dev": "bun run src/server/app.ts",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check src",
+    "format": "biome format --write src"
+  },
+  "dependencies": {
+    "elysia": "^1.1.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.0",
+    "@types/bun": "latest",
+    "typescript": "^5.6.0"
+  }
+}

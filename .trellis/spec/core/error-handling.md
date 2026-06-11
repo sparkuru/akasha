@@ -19,8 +19,11 @@ The interface layer (`server/`) is the only place that converts (1) into (2).
   operation the engine does not implement. Extends `Error`, carries a stable
   message.
 - **Invalid config** — `Akademiya.summon` validates `Gnosis` against
-  `requiredGnosis()` BEFORE constructing the engine; missing keys throw (maps to
-  `invalid_gnosis`).
+  `requiredGnosis()` BEFORE constructing the engine; missing keys throw
+  **`InvalidGnosis`** (added at M1, `core/gnosis.ts`; maps to `invalid_gnosis`).
+  It carries only the missing field *names* (`.missing`) — never values — per the
+  no-secrets rule. `validateRequiredGnosis` treats both `undefined` and `""` as
+  missing.
 - **Capability declaration, not exception probing** — never discover whether an
   operation is supported by try/catching it. Read `clearance()` first. Calling an
   unsupported op is a programming error and may throw `ForbiddenKnowledge`.

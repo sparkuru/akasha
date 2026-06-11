@@ -1,0 +1,5 @@
+{"file": ".trellis/spec/core/directory-structure.md", "reason": "Verify layering hard-rules: core imports nothing from engines/service/server/cli, no Elysia in core"}
+{"file": ".trellis/spec/core/naming-theme.md", "reason": "Verify our identifiers follow the Akasha naming theme; type keys stay literal"}
+{"file": ".trellis/spec/core/type-safety.md", "reason": "Verify strict tsconfig, interface-vs-type usage, no any / non-null assertions"}
+{"file": ".trellis/spec/core/error-handling.md", "reason": "Verify summon error paths throw ForbiddenKnowledge / invalid_gnosis correctly"}
+{"file": ".trellis/spec/server/quality-guidelines.md", "reason": "Verify bun test green, Biome clean, required Akademiya tests present"}

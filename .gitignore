@@ -4,6 +4,12 @@
 .vscode
 .venv
 
+# Node / Bun
+node_modules/
+dist/
+*.tsbuildinfo
+.DS_Store
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

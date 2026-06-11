@@ -1,0 +1,6 @@
+{"file": ".trellis/spec/core/directory-structure.md", "reason": "Target src/ layout and the one-way layering hard-rules M1 must follow"}
+{"file": ".trellis/spec/core/naming-theme.md", "reason": "Mandatory Akasha naming for all our identifiers (Darshan/Capsule/Gnosis/Akademiya/ForbiddenKnowledge)"}
+{"file": ".trellis/spec/core/type-safety.md", "reason": "tsconfig strict flags, interface-vs-type rules, type placement, forbidden patterns"}
+{"file": ".trellis/spec/core/error-handling.md", "reason": "ForbiddenKnowledge / invalid_gnosis semantics for Akademiya.summon error paths"}
+{"file": ".trellis/spec/engines/engine-authoring.md", "reason": "Darshan contract + DarshanCtor/requiredGnosis shape the StubDarshan and Akademiya must satisfy"}
+{"file": ".trellis/spec/server/quality-guidelines.md", "reason": "Bun test + Biome tooling, required tests, layering/naming review rules"}

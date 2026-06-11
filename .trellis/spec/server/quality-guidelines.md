@@ -1,16 +1,31 @@
 # Quality Guidelines
 
-> Conventions derived from the agreed `session.md` design (§1, §8, §9). Tooling
-> commands are provisional until the project is scaffolded — confirm and correct
-> when M1 lands.
+> Conventions derived from the agreed `session.md` design (§1, §8, §9).
+> Tooling pinned at M1 (2026-06-11).
 
-## Tooling (Bun)
+## Tooling (Bun) — pinned at M1
 
 - **Runtime / package manager / test runner: Bun.** No npm/yarn/pnpm, no Jest.
 - Test command: `bun test`. Tests live next to code as `*.test.ts`.
-- Type gate: `tsc --noEmit` (or `bun` equivalent) — zero errors before commit.
-- Lint/format: choose one toolchain (Biome preferred for a Bun project) and
-  pin the exact command here once set up. Do not mix multiple formatters.
+- Type gate: `bun run typecheck` (`tsc --noEmit`) — zero errors before commit.
+- **Lint/format: Biome** (`biome.json`). Commands: `bun run lint`
+  (`biome check src`) and `bun run format` (`biome format --write src`). Biome is
+  scoped to `src/**` via `files.include` — do NOT lint repo tooling dirs
+  (`.trellis`, `.claude`, …). Do not add a second formatter.
+
+## Environment — Docker
+
+Bun is not assumed to be installed on the host. The repo ships a Docker dev
+environment (`Dockerfile`, `compose.yaml`):
+
+- One-shot quality gate: `docker compose run --rm verify` runs
+  install → typecheck → test → lint and exits non-zero on any failure.
+- Boot the server: `docker compose up app` (Elysia on `:3000`).
+- Ad-hoc: `docker run --rm -v "$PWD":/app -w /app oven/bun:1 sh -c '<cmd>'`
+  (the container shell is dash — no bash-only constructs like `PIPESTATUS`).
+- `node_modules` lives in the container / an anonymous volume; it is gitignored.
+- Installs retry (flaky-network resilience): bun's strict integrity check fails
+  hard on corrupted tarballs, so install loops are wrapped with retries.
 
 ## Testing rules
 

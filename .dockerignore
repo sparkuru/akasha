@@ -1,0 +1,13 @@
+.git
+node_modules
+archive
+.trellis
+.claude
+.codex
+.opencode
+.agents
+.vscode
+*.log
+Dockerfile
+.dockerignore
+compose.yaml
