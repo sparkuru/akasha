@@ -5,6 +5,8 @@
 /archive
 .vscode
 .venv
+.agents/
+.opencode/
 
 # Node / Bun
 node_modules/
