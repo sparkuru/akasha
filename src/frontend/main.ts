@@ -71,13 +71,17 @@ function take<T>(outcome: Outcome<T>): T | null {
 async function refreshRemotes(): Promise<void> {
   const remotes = take(await listRemotes(client))
   if (!remotes) return
-  sidebar.replaceChildren(el("h2", {}, "Remotes"), renderRemoteList(remotes, selectRemote))
+  sidebar.replaceChildren(
+    el("h2", {}, "Remotes"),
+    renderRemoteList(remotes, selectRemote, state.remote?.name),
+  )
 }
 
 async function selectRemote(remote: Remote): Promise<void> {
   state.remote = remote
   state.ref = undefined
   clearError()
+  await refreshRemotes()
   main.replaceChildren(el("h2", {}, remote.name), remotePathEntry(remote))
 }
 

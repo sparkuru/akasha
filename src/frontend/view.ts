@@ -40,13 +40,21 @@ export function renderError(error: AkashaError): HTMLElement {
 export function renderRemoteList(
   remotes: Remote[],
   onSelect: (remote: Remote) => void,
+  selectedName?: string,
 ): HTMLElement {
   const list = el("ul", { class: "remotes" })
   for (const remote of remotes) {
+    const selected = remote.name === selectedName
     const button = el(
       "button",
-      { type: "button", class: "remote", "data-remote": remote.name },
-      `${remote.name} (${remote.type})`,
+      {
+        type: "button",
+        class: selected ? "remote selected" : "remote",
+        "data-remote": remote.name,
+        "aria-pressed": selected ? "true" : "false",
+      },
+      el("span", { class: "remote-name" }, remote.name),
+      el("span", { class: "remote-meta" }, `${remote.type} · ${remote.clearance.length} caps`),
     )
     button.addEventListener("click", () => onSelect(remote))
     list.append(el("li", {}, button))
@@ -62,21 +70,23 @@ export interface PathEntryHandlers {
 /** Manual `bucket/prefix` entry; avoids requiring list_buckets clearance. */
 export function renderPathEntry(remote: Remote, handlers: PathEntryHandlers): HTMLElement {
   const form = el("form", { class: "path-entry" })
+  const prefix = el("span", { class: "path-prefix" }, `${remote.name}:`)
   const input = el("input", {
     type: "text",
     class: "path-input",
     name: "path",
     placeholder: "bucket/prefix",
     autocomplete: "off",
+    "aria-label": "Object path",
   })
-  const open = el("button", { type: "submit", class: "path-open" }, "Open")
+  const open = el("button", { type: "submit", class: "path-open primary" }, "Open")
   form.addEventListener("submit", (event) => {
     event.preventDefault()
     handlers.onOpen(input.value.trim())
   })
-  form.append(input, open)
+  form.append(prefix, input, open)
   if (can(remote, "list_buckets") && handlers.onListBuckets !== undefined) {
-    const buckets = el("button", { type: "button", class: "list-buckets" }, "Buckets")
+    const buckets = el("button", { type: "button", class: "list-buckets secondary" }, "Buckets")
     buckets.addEventListener("click", () => handlers.onListBuckets?.())
     form.append(buckets)
   }
@@ -101,7 +111,24 @@ export function renderObjectTable(
 ): HTMLElement {
   const canDownload = can(remote, "download") || can(remote, "presign")
   const canDelete = can(remote, "delete")
+  const wrap = el("section", { class: "object-list" })
   const table = el("table", { class: "objects" })
+  table.append(
+    el(
+      "thead",
+      {},
+      el(
+        "tr",
+        {},
+        el("th", { class: "cell-kind" }, "Type"),
+        el("th", { class: "cell-name" }, "Name"),
+        el("th", { class: "cell-size" }, "Size"),
+        el("th", { class: "cell-modified" }, "Modified"),
+        el("th", { class: "actions" }, "Actions"),
+      ),
+    ),
+  )
+  const body = el("tbody")
   for (const capsule of capsules) {
     const name = el(
       "button",
@@ -112,24 +139,39 @@ export function renderObjectTable(
 
     const actions = el("td", { class: "actions" })
     if (!capsule.isDir) {
-      const dl = el("button", { type: "button", class: "download", disabled: !canDownload }, "↓")
+      const dl = el(
+        "button",
+        { type: "button", class: "icon download", disabled: !canDownload, title: "Download" },
+        "↓",
+      )
       if (canDownload) dl.addEventListener("click", () => handlers.onDownload(capsule))
-      const del = el("button", { type: "button", class: "delete", disabled: !canDelete }, "✕")
+      const del = el(
+        "button",
+        { type: "button", class: "icon delete", disabled: !canDelete, title: "Delete" },
+        "✕",
+      )
       if (canDelete) del.addEventListener("click", () => handlers.onDelete(capsule))
       actions.append(dl, del)
     }
 
-    table.append(
+    body.append(
       el(
         "tr",
         { class: capsule.isDir ? "row dir" : "row" },
+        el("td", { class: "cell-kind" }, capsule.isDir ? "Folder" : "File"),
         el("td", { class: "cell-name" }, name),
-        el("td", { class: "cell-size" }, capsule.size === undefined ? "" : String(capsule.size)),
+        el("td", { class: "cell-size" }, capsule.isDir ? "" : formatSize(capsule.size)),
+        el("td", { class: "cell-modified" }, formatDate(capsule.lastModified)),
         actions,
       ),
     )
   }
-  return table
+  table.append(body)
+  wrap.append(table)
+  if (capsules.length === 0) {
+    wrap.append(el("div", { class: "empty-state" }, "No objects at this path"))
+  }
+  return wrap
 }
 
 /**
@@ -148,9 +190,9 @@ export function renderToolbar(
       const file = input.files?.[0]
       if (file) onUpload(file)
     })
-    bar.append(el("label", { class: "upload" }, "Upload", input))
+    bar.append(el("label", { class: "upload secondary" }, "Upload", input))
   }
-  const reindex = el("button", { type: "button", class: "reindex" }, "Refresh index")
+  const reindex = el("button", { type: "button", class: "reindex secondary" }, "Refresh index")
   reindex.addEventListener("click", () => onRefreshIndex())
   bar.append(reindex)
   return bar
@@ -164,4 +206,31 @@ export function renderPreview(name: string, body: Node | string): HTMLElement {
 /** Pretty-print the persisted index JSON. */
 export function renderIndex(index: unknown): HTMLElement {
   return el("section", { class: "index" }, el("pre", {}, JSON.stringify(index, null, 2)))
+}
+
+function formatSize(size: number | undefined): string {
+  if (size === undefined) return ""
+  if (size < 1024) return `${size} B`
+  const units = ["KB", "MB", "GB", "TB"]
+  let value = size / 1024
+  let unit = units[0] ?? "KB"
+  for (const next of units) {
+    unit = next
+    if (value < 1024 || next === units.at(-1)) break
+    value /= 1024
+  }
+  return `${value >= 10 ? value.toFixed(1) : value.toFixed(2)} ${unit}`
+}
+
+function formatDate(value: string | undefined): string {
+  if (value === undefined) return ""
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return value
+  return date.toLocaleString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  })
 }

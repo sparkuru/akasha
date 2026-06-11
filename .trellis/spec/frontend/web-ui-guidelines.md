@@ -53,6 +53,21 @@ Served by `src/server/static.ts` (the `web` Elysia plugin), mounted **after**
   directory listing for a non-directory ref, stat the exact object and render a
   single file row so direct object keys are actionable.
 
+## File-browser UI pattern
+
+- The first viewport is the browser itself: left remote sidebar plus main file
+  workspace. Do not replace it with a marketing/landing hero.
+- Keep the manual path form as the primary action row. Render the selected remote
+  prefix separately from the free-text path so `bucket/prefix` remains easy to
+  enter while full `remote://bucket/prefix` input still normalizes in `logic.ts`.
+- Object listings use a stable table surface with these columns: type, name,
+  size, modified, actions. Use an empty state for zero capsules; never leave the
+  main pane looking like a no-op.
+- Remote buttons show name, backend type, and capability count. Preserve selected
+  state (`aria-pressed`) when the current remote changes.
+- Visual polish stays in `index.html` until a real asset/CSS split is needed.
+  Keep controls compact, table-first, and suited for repeated file operations.
+
 ## Error surfacing
 
 - Map `AkashaError.code` to a human line in `errorText()`; default to

@@ -5,27 +5,268 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Akasha</title>
     <style>
-      :root { color-scheme: light dark; font-family: system-ui, sans-serif; }
-      body { margin: 0; }
-      #app { display: grid; grid-template-columns: 16rem 1fr; grid-template-rows: auto 1fr; min-height: 100vh; }
+      :root {
+        color-scheme: light;
+        --bg: #f6f7f9;
+        --panel: #ffffff;
+        --panel-strong: #f0f3f5;
+        --line: #d8dde2;
+        --text: #202529;
+        --muted: #65717c;
+        --accent: #0f766e;
+        --accent-soft: #d7f0ec;
+        --danger: #b42318;
+        --danger-soft: #fde2df;
+        --warn: #9a6700;
+        --shadow: 0 10px 24px rgba(32, 37, 41, 0.08);
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+      }
+      #app {
+        display: grid;
+        grid-template-columns: 17.5rem minmax(0, 1fr);
+        grid-template-rows: auto 1fr;
+        min-height: 100vh;
+      }
       #banner { grid-column: 1 / -1; }
-      #sidebar { border-right: 1px solid #8884; padding: 1rem; }
-      #main { padding: 1rem; overflow: auto; }
-      h2 { font-size: 1rem; margin: 0 0 0.5rem; }
+      #sidebar {
+        background: var(--panel);
+        border-right: 1px solid var(--line);
+        padding: 1rem;
+      }
+      #main {
+        min-width: 0;
+        padding: 1.25rem;
+        overflow: auto;
+      }
+      h2 {
+        margin: 0 0 1rem;
+        font-size: 1rem;
+        font-weight: 700;
+        line-height: 1.2;
+      }
       ul { list-style: none; margin: 0; padding: 0; }
-      li { margin: 0.125rem 0; }
-      button { font: inherit; cursor: pointer; }
-      button[disabled] { cursor: not-allowed; opacity: 0.4; }
-      .toast.error { background: #c0392b; color: #fff; padding: 0.5rem 1rem; }
-      table.objects { width: 100%; border-collapse: collapse; }
-      table.objects td { padding: 0.25rem 0.5rem; border-bottom: 1px solid #8882; }
-      .cell-size { text-align: right; color: #888; }
-      .actions { text-align: right; white-space: nowrap; }
-      .name.dir { font-weight: 600; }
-      .path-entry { margin-bottom: 0.75rem; display: flex; gap: 0.5rem; align-items: center; }
-      .path-input { min-width: 14rem; max-width: 32rem; flex: 1 1 18rem; font: inherit; padding: 0.25rem 0.4rem; }
-      .toolbar { margin-bottom: 0.75rem; display: flex; gap: 0.75rem; align-items: center; }
-      pre { white-space: pre-wrap; word-break: break-all; }
+      li { margin: 0.25rem 0; }
+      button,
+      .upload {
+        font: inherit;
+        cursor: pointer;
+        border-radius: 7px;
+        border: 1px solid var(--line);
+        background: var(--panel);
+        color: var(--text);
+      }
+      button:hover,
+      .upload:hover {
+        border-color: #aeb8c2;
+        background: var(--panel-strong);
+      }
+      button:focus-visible,
+      input:focus-visible,
+      .upload:focus-within {
+        outline: 3px solid var(--accent-soft);
+        outline-offset: 2px;
+      }
+      button[disabled] {
+        cursor: not-allowed;
+        opacity: 0.42;
+      }
+      .primary {
+        border-color: var(--accent);
+        background: var(--accent);
+        color: #fff;
+        font-weight: 700;
+      }
+      .primary:hover { background: #0b655e; }
+      .secondary,
+      .upload {
+        padding: 0.48rem 0.7rem;
+        font-weight: 650;
+      }
+      .toast.error {
+        background: var(--danger-soft);
+        color: var(--danger);
+        border-bottom: 1px solid #f4b4ae;
+        padding: 0.75rem 1rem;
+        font-weight: 650;
+      }
+      .remotes {
+        display: grid;
+        gap: 0.35rem;
+      }
+      .remote {
+        width: 100%;
+        display: grid;
+        gap: 0.2rem;
+        padding: 0.72rem 0.78rem;
+        text-align: left;
+      }
+      .remote.selected {
+        border-color: var(--accent);
+        background: var(--accent-soft);
+      }
+      .remote-name {
+        overflow-wrap: anywhere;
+        font-weight: 750;
+      }
+      .remote-meta {
+        color: var(--muted);
+        font-size: 0.78rem;
+      }
+      .path-entry {
+        display: grid;
+        grid-template-columns: auto minmax(10rem, 38rem) auto auto;
+        gap: 0.5rem;
+        align-items: center;
+        margin-bottom: 0.9rem;
+      }
+      .path-prefix {
+        min-height: 2.25rem;
+        display: inline-flex;
+        align-items: center;
+        padding: 0 0.65rem;
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        background: var(--panel-strong);
+        color: var(--muted);
+        font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+        font-size: 0.88rem;
+      }
+      .path-input {
+        min-width: 0;
+        width: 100%;
+        min-height: 2.25rem;
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        background: var(--panel);
+        color: var(--text);
+        font: inherit;
+        padding: 0.48rem 0.65rem;
+      }
+      .path-open {
+        min-height: 2.25rem;
+        padding: 0.48rem 0.9rem;
+      }
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.55rem;
+        align-items: center;
+        margin-bottom: 0.8rem;
+      }
+      .upload {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        min-height: 2.25rem;
+      }
+      .upload-input {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        cursor: pointer;
+      }
+      .object-list {
+        overflow: auto;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+        box-shadow: var(--shadow);
+      }
+      table.objects {
+        width: 100%;
+        min-width: 44rem;
+        border-collapse: collapse;
+      }
+      table.objects th,
+      table.objects td {
+        padding: 0.62rem 0.75rem;
+        border-bottom: 1px solid var(--line);
+        vertical-align: middle;
+      }
+      table.objects th {
+        background: var(--panel-strong);
+        color: var(--muted);
+        font-size: 0.76rem;
+        font-weight: 750;
+        text-align: left;
+        text-transform: uppercase;
+      }
+      table.objects tbody tr:hover { background: #f9fbfb; }
+      table.objects tbody tr:last-child td { border-bottom: 0; }
+      .cell-kind { width: 6.5rem; color: var(--muted); }
+      .cell-name { min-width: 16rem; }
+      .cell-size { width: 8rem; text-align: right; color: var(--muted); white-space: nowrap; }
+      .cell-modified { width: 13rem; color: var(--muted); white-space: nowrap; }
+      .actions { width: 7rem; text-align: right; white-space: nowrap; }
+      .name {
+        max-width: 100%;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: var(--text);
+        text-align: left;
+        overflow-wrap: anywhere;
+      }
+      .name:hover { color: var(--accent); background: transparent; }
+      .name.dir { font-weight: 750; }
+      .icon {
+        width: 2rem;
+        height: 2rem;
+        margin-left: 0.25rem;
+        padding: 0;
+        text-align: center;
+      }
+      .delete:hover {
+        border-color: #f4b4ae;
+        background: var(--danger-soft);
+        color: var(--danger);
+      }
+      .empty-state {
+        padding: 2rem;
+        color: var(--muted);
+        text-align: center;
+      }
+      .preview,
+      .index {
+        margin-top: 1rem;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+        padding: 1rem;
+      }
+      pre {
+        margin: 0;
+        white-space: pre-wrap;
+        word-break: break-all;
+      }
+      @media (max-width: 760px) {
+        #app {
+          display: block;
+        }
+        #sidebar {
+          border-right: 0;
+          border-bottom: 1px solid var(--line);
+        }
+        #main {
+          padding: 1rem;
+        }
+        .path-entry {
+          grid-template-columns: 1fr;
+        }
+        .path-prefix,
+        .path-open,
+        .list-buckets {
+          width: 100%;
+          justify-content: center;
+        }
+      }
     </style>
   </head>
   <body>

@@ -5,7 +5,13 @@ GlobalRegistrator.register()
 
 import { afterAll, describe, expect, it } from "bun:test"
 import type { Capsule, Remote } from "./logic.ts"
-import { renderError, renderObjectTable, renderPathEntry, renderToolbar } from "./view.ts"
+import {
+  renderError,
+  renderObjectTable,
+  renderPathEntry,
+  renderRemoteList,
+  renderToolbar,
+} from "./view.ts"
 
 /**
  * Tier B — DOM rendering under `@happy-dom`, no network (a fake data input only).
@@ -22,7 +28,13 @@ const full: Remote = {
   clearance: ["list_buckets", "read", "download", "upload", "delete", "presign"],
 }
 const readOnly: Remote = { name: "ro", type: "fake", clearance: ["read"] }
-const file: Capsule = { key: "a.txt", name: "a.txt", isDir: false, size: 3 }
+const file: Capsule = {
+  key: "a.txt",
+  name: "a.txt",
+  isDir: false,
+  size: 3072,
+  lastModified: "2026-01-08T03:00:46.000Z",
+}
 const noop = () => {}
 const handlers = { onOpen: noop, onDownload: noop, onDelete: noop }
 
@@ -35,6 +47,16 @@ describe("renderError()", () => {
 })
 
 describe("renderObjectTable() — capability-gated rows", () => {
+  it("renders file-browser columns with formatted metadata", () => {
+    const node = renderObjectTable(full, [file], handlers)
+    expect(node.querySelector("table.objects")).not.toBeNull()
+    expect(node.querySelectorAll("th").length).toBe(5)
+    expect(node.querySelector(".cell-kind")?.textContent).toContain("Type")
+    expect(node.textContent).toContain("File")
+    expect(node.textContent).toContain("3.00 KB")
+    expect(node.textContent).toContain("2026")
+  })
+
   it("enables download/delete for a fully-capable remote", () => {
     const table = renderObjectTable(full, [file], handlers)
     expect(table.querySelector<HTMLButtonElement>(".download")?.disabled).toBe(false)
@@ -45,6 +67,11 @@ describe("renderObjectTable() — capability-gated rows", () => {
     const table = renderObjectTable(readOnly, [file], handlers)
     expect(table.querySelector<HTMLButtonElement>(".download")?.disabled).toBe(true)
     expect(table.querySelector<HTMLButtonElement>(".delete")?.disabled).toBe(true)
+  })
+
+  it("renders an empty state for empty object lists", () => {
+    const table = renderObjectTable(full, [], handlers)
+    expect(table.querySelector(".empty-state")?.textContent).toBe("No objects at this path")
   })
 })
 
@@ -73,6 +100,17 @@ describe("renderPathEntry() — manual path navigation", () => {
         ".list-buckets",
       ),
     ).toBeNull()
+  })
+})
+
+describe("renderRemoteList() — remote metadata", () => {
+  it("renders remote type, capability count, and selected state", () => {
+    const list = renderRemoteList([full], noop, "s3r")
+    const button = list.querySelector<HTMLButtonElement>(".remote")
+    expect(button?.classList.contains("selected")).toBe(true)
+    expect(button?.getAttribute("aria-pressed")).toBe("true")
+    expect(button?.textContent).toContain("fake")
+    expect(button?.textContent).toContain("6 caps")
   })
 })
 
