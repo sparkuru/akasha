@@ -1,0 +1,4 @@
+{"file": ".trellis/spec/engines/engine-authoring.md", "reason": "Verify clearance() matches implemented methods, registration, dependency boundaries"}
+{"file": ".trellis/spec/engines/config-compat.md", "reason": "Verify raw-key reads and no config-layer cross-talk"}
+{"file": ".trellis/spec/core/error-handling.md", "reason": "Verify error mapping: not_found vs backend_error, no secret leakage"}
+{"file": ".trellis/spec/core/type-safety.md", "reason": "Verify strict typing, no any, no unchecked casts"}

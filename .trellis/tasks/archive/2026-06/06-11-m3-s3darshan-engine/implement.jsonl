@@ -1,0 +1,5 @@
+{"file": ".trellis/spec/engines/engine-authoring.md", "reason": "Darshan authoring checklist + S3-compat field hints (endpoint/region/force_path_style) the engine must follow"}
+{"file": ".trellis/spec/engines/config-compat.md", "reason": "Per-engine raw keys for S3 and plaintext-vs-obscure scope"}
+{"file": ".trellis/spec/core/error-handling.md", "reason": "Catch SDK errors, distinguish not_found from backend_error, never leak secrets, ForbiddenKnowledge for unsupported ops"}
+{"file": ".trellis/spec/core/naming-theme.md", "reason": "Class is S3Darshan but typeName stays the literal rclone key s3"}
+{"file": ".trellis/spec/core/type-safety.md", "reason": "Type-safety conventions for the engine and tests"}
