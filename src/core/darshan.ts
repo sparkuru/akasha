@@ -57,3 +57,28 @@ export interface Darshan {
 export class ForbiddenKnowledge extends Error {
   override readonly name = "ForbiddenKnowledge"
 }
+
+/**
+ * CapsuleNotFound — the void holds no such capsule.
+ *
+ * Thrown by an engine when the addressed object/bucket genuinely does not exist
+ * (e.g. S3 `NoSuchKey` / `NoSuchBucket` / HTTP 404). Distinct from a backend
+ * failure so the boundary maps it to `not_found` rather than `backend_error`
+ * (see `core/error-handling.md`). Engines MUST translate vendor "missing" errors
+ * into this — never let a raw SDK exception escape.
+ */
+export class CapsuleNotFound extends Error {
+  override readonly name = "CapsuleNotFound"
+}
+
+/**
+ * BackendFault — the leyline faltered.
+ *
+ * Thrown by an engine for any vendor-SDK / network / backend failure that is NOT
+ * a clean "not found". Carries the original error as `cause` for logs; its
+ * `message` must never contain credentials. Maps to `backend_error` at the
+ * boundary.
+ */
+export class BackendFault extends Error {
+  override readonly name = "BackendFault"
+}

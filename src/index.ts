@@ -6,6 +6,8 @@
  */
 export type { Capsule } from "./core/capsule.ts"
 export {
+  BackendFault,
+  CapsuleNotFound,
   type Darshan,
   type DarshanCapability,
   ForbiddenKnowledge,
@@ -18,7 +20,7 @@ export {
 } from "./core/gnosis.ts"
 export { Akademiya, type DarshanCtor } from "./core/akademiya.ts"
 export { loadRcloneConf, MalformedGnosis, parseRcloneConf } from "./config/rclone.ts"
-export { createAkademiya, LocalDarshan } from "./engines/index.ts"
+export { createAkademiya, LocalDarshan, S3Darshan } from "./engines/index.ts"
 export { type Address, Browser, parseAddress } from "./service/browser.ts"
 export { purify, seal } from "./service/path.ts"
 export {

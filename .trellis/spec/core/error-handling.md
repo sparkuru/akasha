@@ -24,6 +24,17 @@ The interface layer (`server/`) is the only place that converts (1) into (2).
   It carries only the missing field *names* (`.missing`) — never values — per the
   no-secrets rule. `validateRequiredGnosis` treats both `undefined` and `""` as
   missing.
+- **`CapsuleNotFound`** (added at M3, `core/darshan.ts`; maps to `not_found`) —
+  the addressed object/bucket genuinely does not exist. Engines MUST translate a
+  vendor "missing" error into this; for S3 that is `NoSuchKey` / `NotFound` /
+  `NoSuchBucket` or HTTP `404` (`S3Darshan.isNotFound`). Distinct from a backend
+  failure so the boundary can return `404`, not `502`.
+- **`BackendFault`** (added at M3, `core/darshan.ts`; maps to `backend_error`) —
+  any vendor-SDK / network / engine failure that is NOT a clean "not found".
+  Constructed with `new BackendFault(message, { cause: originalError })` — the
+  original SDK error rides on `.cause` for logs; the `message` is the only thing
+  the boundary may surface and MUST NOT contain credentials (build it from the
+  operation name + `error.name`, never from `Gnosis.raw`).
 - **Capability declaration, not exception probing** — never discover whether an
   operation is supported by try/catching it. Read `clearance()` first. Calling an
   unsupported op is a programming error and may throw `ForbiddenKnowledge`.
@@ -43,9 +54,9 @@ Mapping rules (applied in `server/`):
 | Source | `code` |
 |---|---|
 | `ForbiddenKnowledge` | `forbidden_knowledge` |
-| `requiredGnosis()` / `Gnosis` validation failure | `invalid_gnosis` |
-| object/bucket/remote not found | `not_found` |
-| vendor SDK / network / engine failure | `backend_error` |
+| `InvalidGnosis` (`requiredGnosis()` / `Gnosis` validation failure) | `invalid_gnosis` |
+| `CapsuleNotFound` (object/bucket/remote not found) | `not_found` |
+| `BackendFault` (vendor SDK / network / engine failure) | `backend_error` |
 
 `detail` may carry the original error for logs; never put secrets
 (keys, tokens) in `message` or `detail`.

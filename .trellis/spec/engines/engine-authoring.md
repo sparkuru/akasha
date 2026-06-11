@@ -1,7 +1,7 @@
 # Engine Authoring
 
-> Conventions derived from the agreed `session.md` design (§3.2–3.3, §7).
-> Revisit against real `S3Darshan` / `LocalDarshan` code when M1/M3 land.
+> Conventions derived from the agreed `session.md` design (§3.2–3.3, §7) and
+> confirmed against the real `LocalDarshan` (M2) and `S3Darshan` (M3) engines.
 
 ## The contract (decided)
 
@@ -43,9 +43,13 @@ type DarshanCtor = {
 6. **`clearance()`** returns exactly the `DarshanCapability` set the engine
    supports — it MUST match which optional methods are implemented. Consumers
    gate UI/CLI on this; lying here breaks them.
-7. **Error mapping**: catch vendor SDK errors, rethrow as domain errors
-   (see [core/error-handling](../core/error-handling.md)); throw
-   `ForbiddenKnowledge` for unsupported operations.
+7. **Error mapping**: catch vendor SDK errors and rethrow as domain errors —
+   `CapsuleNotFound` for a genuine miss, `BackendFault` (with `{ cause }`) for
+   everything else, `ForbiddenKnowledge` for unsupported operations
+   (see [core/error-handling](../core/error-handling.md)). Route EVERY public
+   method through one mapper so no raw SDK exception can escape (S3Darshan wraps
+   each `client.send` in a private `send()` helper; `presign` has its own
+   try/catch because it does not go through `send`).
 8. **Dependencies**: import only `core` types + the backend SDK. No `service` /
    `server` / `cli` imports.
 9. **Register**: add one `enroll(<Name>Darshan)` line in `engines/index.ts`.
@@ -62,6 +66,31 @@ type DarshanCtor = {
 Rule: do NOT add a native per-vendor engine (e.g. OSS SDK) unless an S3-compat
 gap forces it.
 
+## Testing an engine (zero-network, decided at M3)
+
+The quality gate stays network-free even for network engines. The seam:
+
+- **Constructor takes an optional injected client** as a second arg —
+  `constructor(gnosis: Gnosis, client?: S3Client)`. Production omits it and the
+  engine builds a real client from `Gnosis.raw`; tests pass a client whose
+  transport is replaced.
+- For S3 the test builds a real `S3Client` (construction does no I/O) and swaps
+  its `.send` for a scripted mock keyed by command class name
+  (`ListObjectsV2Command`, `HeadObjectCommand`, …), returning canned output
+  shapes or rejecting with a fake `{ name, $metadata.httpStatusCode }` error.
+  One localized `send as unknown as typeof client.send` cast adapts the mock to
+  the SDK's overloaded signature — acceptable because it neither crosses an
+  Akasha layer boundary nor bypasses a domain type.
+- **`presign` needs no mock**: `getSignedUrl` signs locally with zero network, so
+  a real client built from `raw` produces a deterministic URL to assert on
+  (`X-Amz-Signature=`, `X-Amz-Expires=`, the key).
+- Assert both directions: the **command input** sent (Bucket/Key/Prefix/Delimiter/
+  ContinuationToken/Body) and the **mapped output** (`Capsule` fields,
+  `CapsuleNotFound`/`BackendFault` on error, no secret in the message).
+
+A pure-fs engine like `LocalDarshan` needs none of this — it tests against a real
+temp dir. The injected-client seam is specifically for SDK/network engines.
+
 ## Non-bucket backends
 
 bucket/key is unnatural for WebDAV/local. Map the root to a single virtual bucket
@@ -69,7 +98,13 @@ and keep the uniform `bucket + prefix/key` shape (`session.md` §10).
 
 ## S3-compat field hints (reference §C)
 
+- `S3Darshan` reads `access_key_id` + `secret_access_key` (required) and
+  `endpoint`, `region`, `force_path_style` (optional) from `raw`. `region`
+  defaults to `us-east-1` when absent — the AWS SDK requires a region even though
+  most S3-compat servers ignore it. `force_path_style` is a string in rclone.conf;
+  coerce `"true"`/`"1"`/`"yes"` to boolean before passing `forcePathStyle`.
 - OSS: `endpoint=https://oss-cn-<region>.aliyuncs.com`, `region=cn-<region>`,
   `force_path_style=false` (must be virtual-host).
 - COS: `endpoint=https://cos.<region>.myqcloud.com`, bucket carries an APPID
   suffix (`mybucket-1250000000`).
+- MinIO / R2: usually need `force_path_style=true`.
