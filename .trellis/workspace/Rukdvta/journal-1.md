@@ -138,3 +138,37 @@ Implemented milestone M2: shipped the first real engine (LocalDarshan, zero-netw
 ### Next Steps
 
 - None - task complete
+
+
+## Session 5: M3: S3Darshan engine over AWS SDK v3
+
+**Date**: 2026-06-11
+**Task**: M3: S3Darshan engine over AWS SDK v3
+**Branch**: `the-year-of-the-dove`
+
+### Summary
+
+Shipped S3Darshan (src/engines/s3.ts) covering S3/TOS/OSS/COS/MinIO/R2 via AWS SDK v3: full Darshan contract (listObjects/stat/readBytes/download/uploadFile/delete) plus optional listBuckets/presign, with injected-client zero-network unit tests (s3.test.ts). Reads endpoint/region/force_path_style from Gnosis.raw, maps SDK errors to domain not_found vs backend_error, enrolled in engines/index.ts. Added @aws-sdk/client-s3 + s3-request-presigner. Quality gate green: tsc 0, bun test 49 pass, biome clean. Also ignored local agent tooling dirs (.agents/.opencode).
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `36bb33f` | (see git log) |
+| `c1a5aa3` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
