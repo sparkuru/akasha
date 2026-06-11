@@ -370,3 +370,36 @@ Fixed Web UI manual path entry so selected remotes accept both bucket/prefix and
 ### Next Steps
 
 - None - task complete
+
+
+## Session 12: Polish Web UI file browser
+
+**Date**: 2026-06-11
+**Task**: Polish Web UI file browser
+**Branch**: `the-year-of-the-dove`
+
+### Summary
+
+Polished the vanilla Web UI into a file-browser layout: remote sidebar metadata and selected state, address-style path entry, table headers with type/name/size/modified/action columns, formatted metadata, empty state, compact action controls, responsive shell CSS, and frontend rendering tests. Verified through Docker and refreshed production Compose.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `11afe0b` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
