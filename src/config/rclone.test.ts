@@ -24,6 +24,13 @@ root = /tmp/akasha
 [empty-value]
 type = webdav
 url =
+
+[nutstore]
+type = webdav
+url = https://dav.jianguoyun.com/dav/
+vendor = other
+user = a@example.com
+pass = plaintext-for-mvp
 `
 
 describe("parseRcloneConf", () => {
@@ -60,9 +67,25 @@ describe("parseRcloneConf", () => {
     expect(empty?.raw.url).toBe("")
   })
 
+  it("parses a webdav section without interpreting backend fields", () => {
+    const remotes = parseRcloneConf(SAMPLE)
+    const nutstore = remotes.find((g) => g.name === "nutstore")
+    expect(nutstore?.type).toBe("webdav")
+    expect(nutstore?.raw.url).toBe("https://dav.jianguoyun.com/dav/")
+    expect(nutstore?.raw.user).toBe("a@example.com")
+    expect(nutstore?.raw.pass).toBe("plaintext-for-mvp")
+    expect(nutstore?.raw.vendor).toBe("other")
+  })
+
   it("skips comment and blank lines", () => {
     const remotes = parseRcloneConf(SAMPLE)
-    expect(remotes.map((g) => g.name)).toEqual(["genie", "myserver", "home", "empty-value"])
+    expect(remotes.map((g) => g.name)).toEqual([
+      "genie",
+      "myserver",
+      "home",
+      "empty-value",
+      "nutstore",
+    ])
   })
 
   it("throws MalformedGnosis when a section lacks type", () => {

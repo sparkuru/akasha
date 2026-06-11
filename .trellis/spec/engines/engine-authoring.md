@@ -61,7 +61,7 @@ type DarshanCtor = {
 |---|---|---|---|
 | `S3Darshan` | `s3` | AWS SDK JS v3 | covers S3/TOS/OSS/COS/MinIO/R2 (all S3-compatible) |
 | `LocalDarshan` | `local` | Bun/Node fs | local fs, zero-network tests, proves the abstraction |
-| `WebdavDarshan` | `webdav` | WebDAV client or fetch | extension phase |
+| `WebdavDarshan` | `webdav` | native `fetch` | WebDAV class-1 browsing and mutation |
 
 Rule: do NOT add a native per-vendor engine (e.g. OSS SDK) unless an S3-compat
 gap forces it.
@@ -95,6 +95,85 @@ temp dir. The injected-client seam is specifically for SDK/network engines.
 
 bucket/key is unnatural for WebDAV/local. Map the root to a single virtual bucket
 and keep the uniform `bucket + prefix/key` shape (`session.md` §10).
+
+## Scenario: Adding a new network `Darshan`
+
+### 1. Scope / Trigger
+
+- Trigger: implementing a storage integration whose backend semantics differ
+  from S3, but must still satisfy the existing `Darshan` contract.
+
+### 2. Signatures
+
+- Engine file: `src/engines/<type>.ts`
+- Class: `<Name>Darshan implements Darshan`
+- Constructor: `constructor(gnosis: Gnosis, injectedClientOrFetcher?: ...)`
+- Static contract: `static readonly typeName = "<rclone-type>"`
+- Static config contract: `static requiredGnosis(): Set<string>`
+- Registration: add the class to `createAkademiya().enroll(...)` in
+  `src/engines/index.ts`.
+
+### 3. Contracts
+
+- Read only `Gnosis.raw` in the engine constructor.
+- Required config fields are named only through `requiredGnosis()`.
+- Optional capabilities (`listBuckets`, `presign`) are implemented only when the
+  backend genuinely supports them.
+- `clearance()` must exactly match implemented capabilities.
+- Network engines must accept an injected client/fetcher so tests stay
+  zero-network.
+- Non-bucket backends map the configured root plus `bucket + key` onto their own
+  path model; upper layers remain backend-blind.
+
+### 4. Validation & Error Matrix
+
+| Condition | Domain error |
+|---|---|
+| Unknown `type` | `ForbiddenKnowledge` from `Akademiya.summon` |
+| Missing required raw key | `InvalidGnosis` from `validateRequiredGnosis` |
+| Constructor defensive missing key | `ForbiddenKnowledge` |
+| Backend 404 / missing resource | `CapsuleNotFound` |
+| Backend/network/protocol failure | `BackendFault` |
+| Unsupported operation | Absence from `clearance()`; do not probe with try/catch |
+
+### 5. Good/Base/Bad Cases
+
+- Good: `WebdavDarshan` uses native `fetch`, declares read/download/upload/delete,
+  omits presign/list buckets, and relies on `Browser.url()` proxy fallback.
+- Base: `LocalDarshan` maps a non-bucket filesystem root to the same
+  `bucket + key` contract.
+- Bad: adding WebDAV branches to `service/`, `server/`, `cli/`, or `frontend/`.
+
+### 6. Tests Required
+
+- Type name and `requiredGnosis()`.
+- `clearance()` plus absence/presence of optional methods.
+- Registration via `createAkademiya()`.
+- One zero-network success test per public method.
+- Backend 404 maps to `CapsuleNotFound`.
+- Network/protocol failure maps to `BackendFault` with no secrets in the
+  surfaced message.
+- Config parser preserves backend-specific raw fields without interpreting them.
+
+### 7. Wrong vs Correct
+
+#### Wrong
+
+```ts
+if (remote.type === "webdav") {
+  // service/server code chooses WebDAV behavior directly
+}
+```
+
+#### Correct
+
+```ts
+export function createAkademiya(): Akademiya {
+  return new Akademiya().enroll(LocalDarshan, S3Darshan, WebdavDarshan)
+}
+```
+
+Upper layers summon through `Akademiya` and gate on `clearance()`.
 
 ## S3-compat field hints (reference §C)
 

@@ -20,7 +20,7 @@ export {
 } from "./core/gnosis.ts"
 export { Akademiya, type DarshanCtor } from "./core/akademiya.ts"
 export { loadRcloneConf, MalformedGnosis, parseRcloneConf } from "./config/rclone.ts"
-export { createAkademiya, LocalDarshan, S3Darshan } from "./engines/index.ts"
+export { createAkademiya, LocalDarshan, S3Darshan, WebdavDarshan } from "./engines/index.ts"
 export {
   type Address,
   Browser,
