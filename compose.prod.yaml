@@ -12,7 +12,8 @@ services:
     ports:
       - "${AKASHA_PORT:-3000}:3000"
     volumes:
-      - ./deploy/config/rclone.conf:/config/rclone.conf:ro
+      # - ./deploy/config/rclone.conf:/config/rclone.conf:ro
+      - /tmp/tmp/rclone.conf:/config/rclone.conf:ro
       - akasha_data:/data
     healthcheck:
       test:
